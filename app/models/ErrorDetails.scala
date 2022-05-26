@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.registercountrybycountryreporting.config
+package models
 
-import com.google.inject.AbstractModule
+import play.api.libs.json.Json
 
-class Module extends AbstractModule {
+case class SourceFaultDetail(detail: Seq[String])
 
-  override def configure(): Unit = {
+object SourceFaultDetail {
+  implicit val format = Json.format[SourceFaultDetail]
+}
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+case class ErrorDetail(
+    timestamp: String,
+    correlationId: Option[String],
+    errorCode: String,
+    errorMessage: String,
+    source: String,
+    sourceFaultDetail: Option[SourceFaultDetail]
+)
+
+object ErrorDetail {
+  implicit val format = Json.format[ErrorDetail]
+}
+
+case class ErrorDetails(errorDetail: ErrorDetail)
+
+object ErrorDetails {
+  implicit val format = Json.format[ErrorDetails]
 }
