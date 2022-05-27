@@ -17,8 +17,20 @@
 package generators
 
 import models._
-import models.subscription.common.{ContactInformationForIndividual, ContactInformationForOrganisation, IndividualDetails, OrganisationDetails, PrimaryContact, SecondaryContact}
-import models.subscription.request.{CreateSubscriptionForCBCRequest, RequestCommonForSubscription, RequestDetail, SubscriptionRequest}
+import models.subscription.common.{
+  ContactInformationForIndividual,
+  ContactInformationForOrganisation,
+  IndividualDetails,
+  OrganisationDetails,
+  PrimaryContact,
+  SecondaryContact
+}
+import models.subscription.request.{
+  CreateSubscriptionForCBCRequest,
+  RequestCommonForSubscription,
+  RequestDetail,
+  SubscriptionRequest
+}
 
 import java.time.LocalDate
 import org.scalacheck.Arbitrary.arbitrary
@@ -109,7 +121,7 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryRequestCommonForSubscription
-  : Arbitrary[RequestCommonForSubscription] =
+      : Arbitrary[RequestCommonForSubscription] =
     Arbitrary {
       for {
         receiptDate <- arbitrary[String]
@@ -145,7 +157,7 @@ trait ModelGenerators {
     }
 
   implicit val arbitraryContactInformationForIndividual
-  : Arbitrary[ContactInformationForIndividual] = Arbitrary {
+      : Arbitrary[ContactInformationForIndividual] = Arbitrary {
     for {
       individual <- arbitrary[IndividualDetails]
       email <- arbitrary[String]
@@ -160,7 +172,7 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryContactInformationForOrganisation
-  : Arbitrary[ContactInformationForOrganisation] = Arbitrary {
+      : Arbitrary[ContactInformationForOrganisation] = Arbitrary {
     for {
       organisation <- arbitrary[OrganisationDetails]
       email <- arbitrary[String]
@@ -211,7 +223,7 @@ trait ModelGenerators {
   }
 
   implicit val arbitraryCreateSubscriptionForCBCRequest
-  : Arbitrary[CreateSubscriptionForCBCRequest] =
+      : Arbitrary[CreateSubscriptionForCBCRequest] =
     Arbitrary {
       for {
         requestCommon <- arbitrary[RequestCommonForSubscription]

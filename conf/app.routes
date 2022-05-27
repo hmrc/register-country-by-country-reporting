@@ -1,3 +1,5 @@
 # microservice specific routes
 
 POST    /registration/noId        controllers.RegistrationController.withoutOrgID
+
+

@@ -26,5 +26,3 @@ object CreateSubscriptionForCBCRequest {
   implicit val format: OFormat[CreateSubscriptionForCBCRequest] =
     Json.format[CreateSubscriptionForCBCRequest]
 }
-
-

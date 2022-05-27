@@ -17,7 +17,11 @@
 package connectors
 
 import base.{SpecBase, WireMockServerHandler}
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  aResponse,
+  post,
+  urlEqualTo
+}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import models.subscription.request.CreateSubscriptionForCBCRequest
