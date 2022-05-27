@@ -46,26 +46,19 @@ object PrimaryContact {
   implicit lazy val reads: Reads[PrimaryContact] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "organisation").readNullable[OrganisationDetails] and
+      (__ \ "organisation").read[OrganisationDetails] and
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
     )((organisation, email, phone, mobile) =>
-      (organisation.isDefined) match {
-        case (true) =>
-          PrimaryContact(
-            ContactInformationForOrganisation(
-              organisation.get,
-              email,
-              phone,
-              mobile
-            )
-          )
-        case _ =>
-          throw new Exception(
-            "Primary Contact must have either an organisation or individual element"
-          )
-      }
+      PrimaryContact(
+        ContactInformationForOrganisation(
+          organisation,
+          email,
+          phone,
+          mobile
+        )
+      )
     )
   }
 
@@ -89,26 +82,19 @@ object SecondaryContact {
   implicit lazy val reads: Reads[SecondaryContact] = {
     import play.api.libs.functional.syntax._
     (
-      (__ \ "organisation").readNullable[OrganisationDetails] and
+      (__ \ "organisation").read[OrganisationDetails] and
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
     )((organisation, email, phone, mobile) =>
-      (organisation.isDefined) match {
-        case (true) =>
-          SecondaryContact(
-            ContactInformationForOrganisation(
-              organisation.get,
-              email,
-              phone,
-              mobile
-            )
-          )
-        case _ =>
-          throw new Exception(
-            "Secondary Contact must have either an organisation or individual element"
-          )
-      }
+      SecondaryContact(
+        ContactInformationForOrganisation(
+          organisation,
+          email,
+          phone,
+          mobile
+        )
+      )
     )
   }
 
