@@ -27,29 +27,6 @@ object OrganisationDetails {
     Json.format[OrganisationDetails]
 }
 
-case class IndividualDetails(
-    firstName: String,
-    middleName: Option[String],
-    lastName: String
-)
-
-object IndividualDetails {
-  implicit val format: OFormat[IndividualDetails] =
-    Json.format[IndividualDetails]
-}
-
-case class ContactInformationForIndividual(
-    individual: IndividualDetails,
-    email: String,
-    phone: Option[String],
-    mobile: Option[String]
-) extends ContactInformation
-
-object ContactInformationForIndividual {
-  implicit val format: OFormat[ContactInformationForIndividual] =
-    Json.format[ContactInformationForIndividual]
-}
-
 case class ContactInformationForOrganisation(
     organisation: OrganisationDetails,
     email: String,
@@ -70,25 +47,15 @@ object PrimaryContact {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
-        (__ \ "individual").readNullable[IndividualDetails] and
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )((organisation, individual, email, phone, mobile) =>
-      (organisation.isDefined, individual.isDefined) match {
-        case (true, false) =>
+    )((organisation, email, phone, mobile) =>
+      (organisation.isDefined) match {
+        case (true) =>
           PrimaryContact(
             ContactInformationForOrganisation(
               organisation.get,
-              email,
-              phone,
-              mobile
-            )
-          )
-        case (false, true) =>
-          PrimaryContact(
-            ContactInformationForIndividual(
-              individual.get,
               email,
               phone,
               mobile
@@ -103,10 +70,6 @@ object PrimaryContact {
   }
 
   implicit lazy val writes: OWrites[PrimaryContact] = {
-    case PrimaryContact(
-          contactInformationForInd @ ContactInformationForIndividual(_, _, _, _)
-        ) =>
-      Json.toJsObject(contactInformationForInd)
     case PrimaryContact(
           contactInformationForOrg @ ContactInformationForOrganisation(
             _,
@@ -127,25 +90,15 @@ object SecondaryContact {
     import play.api.libs.functional.syntax._
     (
       (__ \ "organisation").readNullable[OrganisationDetails] and
-        (__ \ "individual").readNullable[IndividualDetails] and
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )((organisation, individual, email, phone, mobile) =>
-      (organisation.isDefined, individual.isDefined) match {
-        case (true, false) =>
+    )((organisation, email, phone, mobile) =>
+      (organisation.isDefined) match {
+        case (true) =>
           SecondaryContact(
             ContactInformationForOrganisation(
               organisation.get,
-              email,
-              phone,
-              mobile
-            )
-          )
-        case (false, true) =>
-          SecondaryContact(
-            ContactInformationForIndividual(
-              individual.get,
               email,
               phone,
               mobile
@@ -160,10 +113,6 @@ object SecondaryContact {
   }
 
   implicit lazy val writes: OWrites[SecondaryContact] = {
-    case SecondaryContact(
-          contactInformationForInd @ ContactInformationForIndividual(_, _, _, _)
-        ) =>
-      Json.toJsObject(contactInformationForInd)
     case SecondaryContact(
           contactInformationForOrg @ ContactInformationForOrganisation(
             _,

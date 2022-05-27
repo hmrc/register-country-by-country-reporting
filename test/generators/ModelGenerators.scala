@@ -18,9 +18,7 @@ package generators
 
 import models._
 import models.subscription.common.{
-  ContactInformationForIndividual,
   ContactInformationForOrganisation,
-  IndividualDetails,
   OrganisationDetails,
   PrimaryContact,
   SecondaryContact
@@ -31,10 +29,10 @@ import models.subscription.request.{
   RequestDetail,
   SubscriptionRequest
 }
-
-import java.time.LocalDate
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
+
+import java.time.LocalDate
 
 trait ModelGenerators {
   self: Generators =>
@@ -136,40 +134,12 @@ trait ModelGenerators {
       )
     }
 
-  implicit val arbitraryIndividualDetails: Arbitrary[IndividualDetails] =
-    Arbitrary {
-      for {
-        firstName <- arbitrary[String]
-        middleName <- Gen.option(arbitrary[String])
-        lastName <- arbitrary[String]
-      } yield IndividualDetails(
-        firstName = firstName,
-        middleName = middleName,
-        lastName = lastName
-      )
-    }
-
   implicit val arbitraryOrganisationDetails: Arbitrary[OrganisationDetails] =
     Arbitrary {
       for {
         name <- arbitrary[String]
       } yield OrganisationDetails(organisationName = name)
     }
-
-  implicit val arbitraryContactInformationForIndividual
-      : Arbitrary[ContactInformationForIndividual] = Arbitrary {
-    for {
-      individual <- arbitrary[IndividualDetails]
-      email <- arbitrary[String]
-      phone <- Gen.option(arbitrary[String])
-      mobile <- Gen.option(arbitrary[String])
-    } yield ContactInformationForIndividual(
-      individual,
-      email,
-      phone,
-      mobile
-    )
-  }
 
   implicit val arbitraryContactInformationForOrganisation
       : Arbitrary[ContactInformationForOrganisation] = Arbitrary {
@@ -185,22 +155,17 @@ trait ModelGenerators {
       mobile
     )
   }
+
   implicit val arbitraryPrimaryContact: Arbitrary[PrimaryContact] = Arbitrary {
     for {
-      contactInformation <- Gen.oneOf(
-        arbitrary[ContactInformationForIndividual],
-        arbitrary[ContactInformationForIndividual]
-      )
+      contactInformation <- arbitrary[ContactInformationForOrganisation]
     } yield PrimaryContact(contactInformation)
   }
 
   implicit val arbitrarySecondaryContact: Arbitrary[SecondaryContact] =
     Arbitrary {
       for {
-        contactInformation <- Gen.oneOf(
-          arbitrary[ContactInformationForIndividual],
-          arbitrary[ContactInformationForIndividual]
-        )
+        contactInformation <- arbitrary[ContactInformationForOrganisation]
       } yield SecondaryContact(contactInformation)
     }
 
