@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.registercountrybycountryreporting.controllers
+package controllers.auth
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import com.google.inject.Inject
+import play.api.mvc.{BodyParsers, Request, Result}
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents)
-    extends BackendController(cc) {
+import scala.concurrent.{ExecutionContext, Future}
 
-  def hello(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("Hello world"))
-  }
+class FakeAuthAction @Inject() (
+    val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext)
+    extends AuthAction {
+  override def invokeBlock[A](
+      request: Request[A],
+      block: Request[A] => Future[Result]
+  ): Future[Result] =
+    block(request)
 }

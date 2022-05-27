@@ -1,3 +1,3 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.registercountrybycountryreporting.controllers.MicroserviceHelloWorldController.hello
+POST    /registration/noId        controllers.RegistrationController.withoutOrgID
