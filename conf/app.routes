@@ -2,4 +2,5 @@
 
 POST    /registration/noId        controllers.RegistrationController.withoutOrgID
 
+POST    /subscription/create-subscription     controllers.SubscriptionController.createSubscription
 
