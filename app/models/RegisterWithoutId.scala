@@ -18,8 +18,6 @@ package models
 
 import play.api.libs.json._
 
-import java.time.LocalDate
-
 case class NoIdOrganisation(organisationName: String)
 
 object NoIdOrganisation {
