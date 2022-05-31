@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.RegistrationConnector
 import controllers.auth.AuthAction
-import models.{ErrorDetails, RegisterWithoutId}
+import models.{ErrorDetails, RegisterWithID, RegisterWithoutId}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Result}
@@ -50,6 +50,17 @@ class RegistrationController @Inject() (
             registrationConnector
               .sendWithoutIDInformation(sub)
               .map(convertToResult)
+        )
+  }
+
+  def withOrgUTR: Action[JsValue] = authenticate(parse.json).async {
+    implicit request =>
+      logger.info("Organisation having UTR")
+      request.body
+        .validate[RegisterWithID]
+        .fold(
+          _ => Future.successful(BadRequest("")),
+          sub => registrationConnector.sendWithID(sub).map(convertToResult)
         )
   }
 

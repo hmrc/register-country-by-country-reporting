@@ -18,7 +18,7 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
-import models.RegisterWithoutId
+import models.{RegisterWithID, RegisterWithoutId}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,4 +39,15 @@ class RegistrationConnector @Inject() (
     )(wts = RegisterWithoutId.format, rds = httpReads, hc = hc, ec = ec)
   }
 
+  def sendWithID(
+      registration: RegisterWithID
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val serviceName = "register-with-id"
+
+    http.POST[RegisterWithID, HttpResponse](
+      config.baseUrl(serviceName),
+      registration,
+      headers = extraHeaders(config, serviceName)
+    )(wts = RegisterWithID.format, rds = httpReads, hc = hc, ec = ec)
+  }
 }

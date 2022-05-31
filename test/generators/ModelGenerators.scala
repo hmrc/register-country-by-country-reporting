@@ -17,6 +17,7 @@
 package generators
 
 import models._
+
 import java.time.LocalDate
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -105,4 +106,45 @@ trait ModelGenerators {
     )
   }
 
+  implicit val arbitraryPayloadRegisterWithID: Arbitrary[RegisterWithID] =
+    Arbitrary {
+      for {
+        registerWithIDRequest <- arbitrary[RegisterWithIDRequest]
+      } yield RegisterWithID(registerWithIDRequest)
+    }
+
+  implicit val arbitraryRegisterWithIDRequest
+      : Arbitrary[RegisterWithIDRequest] = Arbitrary {
+    for {
+      requestCommon <- arbitrary[RequestCommon]
+      requestDetail <- arbitrary[RequestWithIDDetails]
+    } yield RegisterWithIDRequest(requestCommon, requestDetail)
+  }
+
+  implicit val arbitraryRequestWithIDDetails: Arbitrary[RequestWithIDDetails] =
+    Arbitrary {
+      for {
+        idType <- arbitrary[String]
+        idNumber <- arbitrary[String]
+        requiresNameMatch <- arbitrary[Boolean]
+        isAnAgent <- arbitrary[Boolean]
+        partnerDetails <- arbitrary[WithIDOrganisation]
+      } yield RequestWithIDDetails(
+        idType,
+        idNumber,
+        requiresNameMatch,
+        isAnAgent,
+        partnerDetails
+      )
+    }
+
+  implicit val arbitraryWithIDOrganisation: Arbitrary[WithIDOrganisation] =
+    Arbitrary {
+      for {
+        organisationName <- arbitrary[String]
+        organisationType <- Gen.oneOf(
+          Seq("0000", "0001", "0002", "0003", "0004")
+        )
+      } yield WithIDOrganisation(organisationName, organisationType)
+    }
 }

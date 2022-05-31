@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
 }
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
-import models.RegisterWithoutId
+import models.{RegisterWithID, RegisterWithoutId}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -40,7 +40,8 @@ class RegistrationConnectorSpec
 
   override lazy val app: Application = applicationBuilder()
     .configure(
-      "microservice.services.register-without-id.port" -> server.port()
+      "microservice.services.register-without-id.port" -> server.port(),
+      "microservice.services.register-with-id.port" -> server.port()
     )
     .build()
 
@@ -84,6 +85,47 @@ class RegistrationConnectorSpec
           )
 
           val result = connector.sendWithoutIDInformation(sub)
+          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
+    "for a registration with id submission" - {
+      "must return status as OK for submission of Subscription" in {
+
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/cbc/dct70b/v1",
+            OK
+          )
+
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return status as BAD_REQUEST for submission of invalid subscription" in {
+
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/cbc/dct70b/v1",
+            BAD_REQUEST
+          )
+
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe BAD_REQUEST
+        }
+      }
+
+      "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
+
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/cbc/dct70b/v1",
+            INTERNAL_SERVER_ERROR
+          )
+
+          val result = connector.sendWithID(sub)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
