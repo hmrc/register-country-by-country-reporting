@@ -1,4 +1,7 @@
 # microservice specific routes
 
-POST    /registration/noId        controllers.RegistrationController.withoutOrgID
-POST    /registration/utr         controllers.RegistrationController.withOrgUTR
+POST    /registration/noId                      controllers.RegistrationController.withoutOrgID
+POST    /registration/utr                       controllers.RegistrationController.withOrgUTR
+
+POST    /subscription/create-subscription       controllers.SubscriptionController.createSubscription
+

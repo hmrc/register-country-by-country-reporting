@@ -17,21 +17,14 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
 import connectors.RegistrationConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.{
-  ErrorDetail,
-  ErrorDetails,
-  RegisterWithID,
-  RegisterWithoutId,
-  SourceFaultDetail
-}
+import models._
 import org.joda.time.DateTime
+import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
-import org.scalacheck.Gen.const
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -40,7 +33,6 @@ import play.api.test.Helpers.{POST, route, status, _}
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.{ExecutionContext, Future}
 
