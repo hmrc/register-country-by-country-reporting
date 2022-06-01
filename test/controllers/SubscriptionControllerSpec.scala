@@ -20,8 +20,8 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.{ErrorDetail, ErrorDetails, SourceFaultDetail}
 import models.subscription.request.CreateSubscriptionForCBCRequest
+import models.{ErrorDetail, ErrorDetails, SourceFaultDetail}
 import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
