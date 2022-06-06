@@ -245,7 +245,7 @@ trait ModelGenerators {
     )
   }
 
-  implicit val arbitraryReadSubscriptionForMDRRequest
+  implicit val arbitraryReadSubscriptionForCBCRequest
       : Arbitrary[DisplaySubscriptionForCBCRequest] =
     Arbitrary {
       for {

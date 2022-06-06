@@ -63,7 +63,7 @@ class SubscriptionController @Inject() (
       subscriptionSubmissionResult.fold(
         invalid = _ =>
           Future.successful(
-            BadRequest("CreateSubscriptionForMDRRequest is invalid")
+            BadRequest("CreateSubscriptionForCBCRequest is invalid")
           ),
         valid = sub =>
           for {
@@ -74,9 +74,6 @@ class SubscriptionController @Inject() (
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
     authenticate.async { implicit request =>
-      val test = DisplaySubscriptionForCBCRequest(safeId)
-
-      println("-----------------------test---------------")
       for {
         response <- subscriptionConnector.readSubscriptionInformation(
           DisplaySubscriptionForCBCRequest(safeId)
