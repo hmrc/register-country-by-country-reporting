@@ -35,16 +35,15 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.SubscriptionConnector
 import controllers.auth.AuthAction
-import models.ErrorDetails
+import models.SafeId
+import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
-import play.api.Logger
-import play.api.libs.json.{JsResult, JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Result}
-import uk.gov.hmrc.http.HttpResponse
+import play.api.libs.json.{JsResult, JsValue}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.{Logger, Logging}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
 
 class SubscriptionController @Inject() (
     val config: AppConfig,
@@ -52,9 +51,8 @@ class SubscriptionController @Inject() (
     subscriptionConnector: SubscriptionConnector,
     override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
-    extends BackendController(controllerComponents) {
-
-  private val logger: Logger = Logger(this.getClass)
+    extends BackendController(controllerComponents)
+    with Logging {
 
   def createSubscription: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
@@ -65,50 +63,22 @@ class SubscriptionController @Inject() (
       subscriptionSubmissionResult.fold(
         invalid = _ =>
           Future.successful(
-            BadRequest("CreateSubscriptionForMDRRequest is invalid")
+            BadRequest("CreateSubscriptionForCBCRequest is invalid")
           ),
         valid = sub =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          } yield convertToResult(response)
+          } yield convertToResult(response)(implicitly[Logger](logger))
       )
   }
 
-  private def convertToResult(httpResponse: HttpResponse): Result =
-    httpResponse.status match {
-      case OK        => Ok(httpResponse.body)
-      case NOT_FOUND => NotFound(httpResponse.body)
-      case BAD_REQUEST =>
-        logDownStreamError(httpResponse.body)
-        BadRequest(httpResponse.body)
-
-      case FORBIDDEN =>
-        logDownStreamError(httpResponse.body)
-        Forbidden(httpResponse.body)
-
-      case SERVICE_UNAVAILABLE =>
-        logDownStreamError(httpResponse.body)
-        ServiceUnavailable(httpResponse.body)
-
-      case CONFLICT =>
-        logDownStreamError(httpResponse.body)
-        Conflict(httpResponse.body)
-
-      case _ =>
-        logDownStreamError(httpResponse.body)
-        InternalServerError(httpResponse.body)
-
-    }
-
-  private def logDownStreamError(body: String): Unit = {
-    val error = Try(Json.parse(body).validate[ErrorDetails])
-    error match {
-      case Success(JsSuccess(value, _)) =>
-        logger.warn(
-          s"Error with submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString)}"
+  def readSubscription(safeId: SafeId): Action[AnyContent] =
+    authenticate.async { implicit request =>
+      for {
+        response <- subscriptionConnector.readSubscriptionInformation(
+          DisplaySubscriptionForCBCRequest(safeId)
         )
-      case _ =>
-        logger.warn("Error with submission but return is not a valid json")
+      } yield convertToResult(response)(implicitly[Logger](logger))
     }
-  }
+
 }

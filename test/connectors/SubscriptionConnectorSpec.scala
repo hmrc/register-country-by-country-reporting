@@ -24,6 +24,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{
 }
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
+import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
@@ -81,6 +82,33 @@ class SubscriptionConnectorSpec
       }
     }
 
+    "read subscription" - {
+      "must return status as OK for read Subscription" in {
+        stubResponse(
+          "/cbc/dct70d/v1",
+          OK
+        )
+
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { sub =>
+          val result = connector.readSubscriptionInformation(sub)
+          result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return an error status for  invalid read Subscription" in {
+
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) {
+          (sub, errorCode) =>
+            stubResponse(
+              "/cbc/dct70d/v1",
+              errorCode
+            )
+
+            val result = connector.readSubscriptionInformation(sub)
+            result.futureValue.status mustBe errorCode
+        }
+      }
+    }
   }
 
   private def stubResponse(
