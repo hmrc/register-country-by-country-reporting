@@ -18,6 +18,6 @@ object AppDependencies {
     "wolfendale"              %% "scalacheck-gen-regexp"      % "0.1.2"       % Test,
     "org.scalatestplus.play"  %% "scalatestplus-play"         % "5.1.0"       % Test,
     "com.github.tomakehurst"  %  "wiremock-standalone"        % "2.27.0"      % Test,
-    "com.vladsch.flexmark"    %  "flexmark-all"                % "0.62.2"
+    "com.vladsch.flexmark"    %  "flexmark-all"               % "0.62.2"
   )
 }

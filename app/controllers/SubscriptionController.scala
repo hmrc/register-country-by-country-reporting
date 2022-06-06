@@ -39,7 +39,7 @@ import models.SafeId
 import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import play.api.libs.json.{JsResult, JsValue}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -72,14 +72,16 @@ class SubscriptionController @Inject() (
       )
   }
 
-  def readSubscription(safeId: SafeId): Action[JsValue] =
-    authenticate(parse.json).async { implicit request =>
+  def readSubscription(safeId: SafeId): Action[AnyContent] =
+    authenticate.async { implicit request =>
+      val test = DisplaySubscriptionForCBCRequest(safeId)
+
+      println("-----------------------test---------------")
       for {
         response <- subscriptionConnector.readSubscriptionInformation(
           DisplaySubscriptionForCBCRequest(safeId)
         )
       } yield convertToResult(response)(implicitly[Logger](logger))
-
     }
 
 }
