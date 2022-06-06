@@ -18,6 +18,7 @@ package connectors
 
 import com.google.inject.Inject
 import config.AppConfig
+import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -38,6 +39,22 @@ class SubscriptionConnector @Inject() (
       headers = extraHeaders(config, serviceName)
     )(
       wts = CreateSubscriptionForCBCRequest.format,
+      rds = httpReads,
+      hc = hc,
+      ec = ec
+    )
+  }
+
+  def readSubscriptionInformation(
+      subscription: DisplaySubscriptionForCBCRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val serviceName = "read-subscription"
+    http.POST[DisplaySubscriptionForCBCRequest, HttpResponse](
+      config.baseUrl(serviceName),
+      subscription,
+      headers = extraHeaders(config, serviceName)
+    )(
+      wts = DisplaySubscriptionForCBCRequest.format,
       rds = httpReads,
       hc = hc,
       ec = ec

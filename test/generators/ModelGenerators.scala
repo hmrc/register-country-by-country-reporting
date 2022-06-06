@@ -19,6 +19,11 @@ package generators
 import models._
 import models.subscription.common._
 import models.subscription.request._
+import models.subscription.{
+  DisplaySubscriptionDetails,
+  DisplaySubscriptionForCBCRequest,
+  ReadSubscriptionRequestDetail
+}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 
@@ -226,6 +231,28 @@ trait ModelGenerators {
         requestDetail <- arbitrary[RequestDetail]
       } yield CreateSubscriptionForCBCRequest(
         SubscriptionRequest(requestCommon, requestDetail)
+      )
+    }
+
+  implicit val arbitraryReadSubscriptionRequestDetail
+      : Arbitrary[ReadSubscriptionRequestDetail] = Arbitrary {
+    for {
+      idType <- arbitrary[String]
+      idNumber <- arbitrary[String]
+    } yield ReadSubscriptionRequestDetail(
+      IDType = idType,
+      IDNumber = idNumber
+    )
+  }
+
+  implicit val arbitraryReadSubscriptionForMDRRequest
+      : Arbitrary[DisplaySubscriptionForCBCRequest] =
+    Arbitrary {
+      for {
+        requestCommon <- arbitrary[RequestCommonForSubscription]
+        requestDetail <- arbitrary[ReadSubscriptionRequestDetail]
+      } yield DisplaySubscriptionForCBCRequest(
+        DisplaySubscriptionDetails(requestCommon, requestDetail)
       )
     }
 }

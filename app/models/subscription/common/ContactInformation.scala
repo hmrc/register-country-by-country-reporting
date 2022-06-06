@@ -16,7 +16,7 @@
 
 package models.subscription.common
 
-import play.api.libs.json.{Json, OFormat, OWrites, Reads, __}
+import play.api.libs.json._
 
 sealed trait ContactInformation
 
