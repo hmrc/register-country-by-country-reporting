@@ -1,7 +1,8 @@
 # microservice specific routes
 
-POST    /registration/noId                      controllers.RegistrationController.withoutOrgID
-POST    /registration/utr                       controllers.RegistrationController.withOrgUTR
+POST    /registration/noId                              controllers.RegistrationController.withoutOrgID
+POST    /registration/utr                               controllers.RegistrationController.withOrgUTR
 
-POST    /subscription/create-subscription       controllers.SubscriptionController.createSubscription
+POST    /subscription/create-subscription               controllers.SubscriptionController.createSubscription
+POST    /subscription/read-subscription/:safeId         controllers.SubscriptionController.readSubscription(safeId: models.SafeId)
 
