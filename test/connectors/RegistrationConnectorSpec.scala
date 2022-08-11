@@ -95,7 +95,7 @@ class RegistrationConnectorSpec
 
         forAll(arbitrary[RegisterWithID]) { sub =>
           stubResponse(
-            "/cbc/dct70b/v1",
+            "/dac/dct50b/v1",
             OK
           )
 
@@ -108,7 +108,7 @@ class RegistrationConnectorSpec
 
         forAll(arbitrary[RegisterWithID]) { sub =>
           stubResponse(
-            "/cbc/dct70b/v1",
+            "/dac/dct50b/v1",
             BAD_REQUEST
           )
 
@@ -121,7 +121,7 @@ class RegistrationConnectorSpec
 
         forAll(arbitrary[RegisterWithID]) { sub =>
           stubResponse(
-            "/cbc/dct70b/v1",
+            "/dac/dct50b/v1",
             INTERNAL_SERVER_ERROR
           )
 
