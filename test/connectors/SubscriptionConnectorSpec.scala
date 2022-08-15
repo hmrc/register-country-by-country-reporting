@@ -85,7 +85,7 @@ class SubscriptionConnectorSpec
     "read subscription" - {
       "must return status as OK for read Subscription" in {
         stubResponse(
-          "/cbc/dct70d/v1",
+          "/dac/dct50d/v1",
           OK
         )
 
@@ -100,7 +100,7 @@ class SubscriptionConnectorSpec
         forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) {
           (sub, errorCode) =>
             stubResponse(
-              "/cbc/dct70d/v1",
+              "/dac/dct50d/v1",
               errorCode
             )
 
