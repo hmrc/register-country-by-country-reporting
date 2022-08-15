@@ -57,7 +57,7 @@ class SubscriptionConnectorSpec
     "create subscription CBC" - {
       "must return status as OK for submission of Subscription" in {
         stubResponse(
-          "/cbc/dct03/v1",
+          "/dac/dct50c/v1",
           OK
         )
 
@@ -72,7 +72,7 @@ class SubscriptionConnectorSpec
         forAll(arbitrary[CreateSubscriptionForCBCRequest], errorCodes) {
           (sub, errorCode) =>
             stubResponse(
-              "/cbc/dct03/v1",
+              "/dac/dct50c/v1",
               errorCode
             )
 
