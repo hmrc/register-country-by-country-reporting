@@ -53,24 +53,22 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
           OK
         )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          sub =>
-            val result = connector.sendSubscriptionInformation(sub)
-            result.futureValue.status mustBe OK
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { sub =>
+          val result = connector.sendSubscriptionInformation(sub)
+          result.futureValue.status mustBe OK
         }
       }
 
       "must return an error status for submission of invalid subscription Data" in {
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest], errorCodes) {
-          (sub, errorCode) =>
-            stubResponse(
-              "/dac6/dct50c/v1",
-              errorCode
-            )
+        forAll(arbitrary[CreateSubscriptionForCBCRequest], errorCodes) { (sub, errorCode) =>
+          stubResponse(
+            "/dac6/dct50c/v1",
+            errorCode
+          )
 
-            val result = connector.sendSubscriptionInformation(sub)
-            result.futureValue.status mustBe errorCode
+          val result = connector.sendSubscriptionInformation(sub)
+          result.futureValue.status mustBe errorCode
         }
       }
     }
@@ -82,24 +80,22 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
           OK
         )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          sub =>
-            val result = connector.readSubscriptionInformation(sub)
-            result.futureValue.status mustBe OK
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { sub =>
+          val result = connector.readSubscriptionInformation(sub)
+          result.futureValue.status mustBe OK
         }
       }
 
       "must return an error status for  invalid read Subscription" in {
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) {
-          (sub, errorCode) =>
-            stubResponse(
-              "/dac6/dct50d/v1",
-              errorCode
-            )
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) { (sub, errorCode) =>
+          stubResponse(
+            "/dac6/dct50d/v1",
+            errorCode
+          )
 
-            val result = connector.readSubscriptionInformation(sub)
-            result.futureValue.status mustBe errorCode
+          val result = connector.readSubscriptionInformation(sub)
+          result.futureValue.status mustBe errorCode
         }
       }
     }

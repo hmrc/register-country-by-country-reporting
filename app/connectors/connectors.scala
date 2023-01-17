@@ -69,9 +69,7 @@ package object connectors {
       "x-correlation-id" -> UUID.randomUUID().toString,
       "x-conversation-id" -> {
         headerCarrier.sessionId
-          .map(
-            s => stripSession(s.value)
-          )
+          .map(s => stripSession(s.value))
           .getOrElse(UUID.randomUUID().toString)
       },
       "content-type" -> "application/json",

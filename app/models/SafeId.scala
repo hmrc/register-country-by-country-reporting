@@ -25,9 +25,7 @@ object SafeId {
 
   implicit def reads: Reads[SafeId] = __.read[String] map SafeId.apply
 
-  implicit def writes: Writes[SafeId] = Writes(
-    safeId => JsString(safeId.value)
-  )
+  implicit def writes: Writes[SafeId] = Writes(safeId => JsString(safeId.value))
 
   implicit lazy val pathBindable: PathBindable[SafeId] =
     new PathBindable[SafeId] {

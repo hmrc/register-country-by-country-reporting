@@ -41,9 +41,8 @@ class AuthActionImpl @Inject() (
 
     authorised() {
       block(request)
-    } recover {
-      case _: NoActiveSession =>
-        Status(UNAUTHORIZED)
+    } recover { case _: NoActiveSession =>
+      Status(UNAUTHORIZED)
     }
   }
 

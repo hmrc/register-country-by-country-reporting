@@ -95,9 +95,7 @@ object RequestDetails {
         (__ \ "address").read[Address] and
         (__ \ "contactDetails").read[ContactDetails] and
         (__ \ "identification").readNullable[Identification]
-    )(
-      (organisation, address, contactDetails, identification) => RequestDetails(organisation, address, contactDetails, identification)
-    )
+    )((organisation, address, contactDetails, identification) => RequestDetails(organisation, address, contactDetails, identification))
   }
 }
 

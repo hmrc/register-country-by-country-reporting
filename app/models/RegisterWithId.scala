@@ -64,27 +64,25 @@ object RequestWithIDDetails {
         (__ \ "requiresNameMatch").read[Boolean] and
         (__ \ "isAnAgent").read[Boolean] and
         (__ \ "organisation").read[WithIDOrganisation]
-    )(
-      (idType, idNumber, requiresNameMatch, isAnAgent, organisation) =>
-        RequestWithIDDetails(
-          idType,
-          idNumber,
-          requiresNameMatch,
-          isAnAgent,
-          organisation
-        )
+    )((idType, idNumber, requiresNameMatch, isAnAgent, organisation) =>
+      RequestWithIDDetails(
+        idType,
+        idNumber,
+        requiresNameMatch,
+        isAnAgent,
+        organisation
+      )
     )
   }
 
   implicit lazy val requestWithIDDetailsWrites: OWrites[RequestWithIDDetails] =
-    OWrites[RequestWithIDDetails] {
-      idDetails =>
-        Json.obj(
-          "IDType"            -> idDetails.IDType,
-          "IDNumber"          -> idDetails.IDNumber,
-          "requiresNameMatch" -> idDetails.requiresNameMatch,
-          "isAnAgent"         -> idDetails.isAnAgent,
-          "organisation"      -> idDetails.partnerDetails
-        )
+    OWrites[RequestWithIDDetails] { idDetails =>
+      Json.obj(
+        "IDType"            -> idDetails.IDType,
+        "IDNumber"          -> idDetails.IDNumber,
+        "requiresNameMatch" -> idDetails.requiresNameMatch,
+        "isAnAgent"         -> idDetails.isAnAgent,
+        "organisation"      -> idDetails.partnerDetails
+      )
     }
 }

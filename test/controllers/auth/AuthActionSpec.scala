@@ -40,9 +40,8 @@ class AuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
 
   class Harness(authAction: AuthAction) extends InjectedController {
 
-    def onPageLoad(): Action[AnyContent] = authAction {
-      _ =>
-        Ok
+    def onPageLoad(): Action[AnyContent] = authAction { _ =>
+      Ok
     }
   }
 

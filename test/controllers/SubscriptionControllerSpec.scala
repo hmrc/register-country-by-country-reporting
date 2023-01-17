@@ -98,17 +98,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual BAD_REQUEST
+          val result = route(application, request).value
+          status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -128,17 +127,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual FORBIDDEN
+          val result = route(application, request).value
+          status(result) mustEqual FORBIDDEN
         }
       }
 
@@ -158,17 +156,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
 
@@ -192,17 +189,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual INTERNAL_SERVER_ERROR
+          val result = route(application, request).value
+          status(result) mustEqual INTERNAL_SERVER_ERROR
         }
       }
 
@@ -236,17 +232,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual CONFLICT
+          val result = route(application, request).value
+          status(result) mustEqual CONFLICT
         }
       }
 
@@ -266,17 +261,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual NOT_FOUND
+          val result = route(application, request).value
+          status(result) mustEqual NOT_FOUND
         }
       }
 
@@ -296,17 +290,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) {
-          subscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.createSubscription.url
-              )
-                .withJsonBody(Json.toJson(subscriptionForCBCRequest))
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.createSubscription.url
+            )
+              .withJsonBody(Json.toJson(subscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
     }
@@ -357,17 +350,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual BAD_REQUEST
+          val result = route(application, request).value
+          status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -387,17 +379,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual FORBIDDEN
+          val result = route(application, request).value
+          status(result) mustEqual FORBIDDEN
         }
       }
 
@@ -417,17 +408,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
 
@@ -451,17 +441,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual INTERNAL_SERVER_ERROR
+          val result = route(application, request).value
+          status(result) mustEqual INTERNAL_SERVER_ERROR
         }
       }
 
@@ -481,17 +470,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual NOT_FOUND
+          val result = route(application, request).value
+          status(result) mustEqual NOT_FOUND
         }
       }
 
@@ -511,17 +499,16 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) {
-          displaySubscriptionForCBCRequest =>
-            val request =
-              FakeRequest(
-                POST,
-                routes.SubscriptionController.readSubscription(safeId).url
-              )
-                .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { displaySubscriptionForCBCRequest =>
+          val request =
+            FakeRequest(
+              POST,
+              routes.SubscriptionController.readSubscription(safeId).url
+            )
+              .withJsonBody(Json.toJson(displaySubscriptionForCBCRequest))
 
-            val result = route(application, request).value
-            status(result) mustEqual SERVICE_UNAVAILABLE
+          val result = route(application, request).value
+          status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
     }

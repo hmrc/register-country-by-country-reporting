@@ -55,31 +55,29 @@ class SubscriptionController @Inject() (
     extends BackendController(controllerComponents)
     with Logging {
 
-  def createSubscription: Action[JsValue] = authenticate(parse.json).async {
-    implicit request =>
-      val subscriptionSubmissionResult: JsResult[CreateSubscriptionForCBCRequest] =
-        request.body.validate[CreateSubscriptionForCBCRequest]
+  def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    val subscriptionSubmissionResult: JsResult[CreateSubscriptionForCBCRequest] =
+      request.body.validate[CreateSubscriptionForCBCRequest]
 
-      subscriptionSubmissionResult.fold(
-        invalid = _ =>
-          Future.successful(
-            BadRequest("CreateSubscriptionForCBCRequest is invalid")
-          ),
-        valid = sub =>
-          for {
-            response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          } yield convertToResult(response)(implicitly[Logger](logger))
-      )
+    subscriptionSubmissionResult.fold(
+      invalid = _ =>
+        Future.successful(
+          BadRequest("CreateSubscriptionForCBCRequest is invalid")
+        ),
+      valid = sub =>
+        for {
+          response <- subscriptionConnector.sendSubscriptionInformation(sub)
+        } yield convertToResult(response)(implicitly[Logger](logger))
+    )
   }
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
-    authenticate.async {
-      implicit request =>
-        for {
-          response <- subscriptionConnector.readSubscriptionInformation(
-            DisplaySubscriptionForCBCRequest(safeId)
-          )
-        } yield convertToResult(response)(implicitly[Logger](logger))
+    authenticate.async { implicit request =>
+      for {
+        response <- subscriptionConnector.readSubscriptionInformation(
+          DisplaySubscriptionForCBCRequest(safeId)
+        )
+      } yield convertToResult(response)(implicitly[Logger](logger))
     }
 
 }

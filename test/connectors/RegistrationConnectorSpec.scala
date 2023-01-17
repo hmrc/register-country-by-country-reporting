@@ -44,43 +44,40 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
     "for a registration without id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-        forAll(arbitrary[RegisterWithoutId]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50a/v1",
-              OK
-            )
+        forAll(arbitrary[RegisterWithoutId]) { sub =>
+          stubResponse(
+            "/dac6/dct50a/v1",
+            OK
+          )
 
-            val result = connector.sendWithoutIDInformation(sub)
-            result.futureValue.status mustBe OK
+          val result = connector.sendWithoutIDInformation(sub)
+          result.futureValue.status mustBe OK
         }
       }
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
 
-        forAll(arbitrary[RegisterWithoutId]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50a/v1",
-              BAD_REQUEST
-            )
+        forAll(arbitrary[RegisterWithoutId]) { sub =>
+          stubResponse(
+            "/dac6/dct50a/v1",
+            BAD_REQUEST
+          )
 
-            val result = connector.sendWithoutIDInformation(sub)
-            result.futureValue.status mustBe BAD_REQUEST
+          val result = connector.sendWithoutIDInformation(sub)
+          result.futureValue.status mustBe BAD_REQUEST
         }
       }
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
 
-        forAll(arbitrary[RegisterWithoutId]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50a/v1",
-              INTERNAL_SERVER_ERROR
-            )
+        forAll(arbitrary[RegisterWithoutId]) { sub =>
+          stubResponse(
+            "/dac6/dct50a/v1",
+            INTERNAL_SERVER_ERROR
+          )
 
-            val result = connector.sendWithoutIDInformation(sub)
-            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+          val result = connector.sendWithoutIDInformation(sub)
+          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
@@ -88,43 +85,40 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
     "for a registration with id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-        forAll(arbitrary[RegisterWithID]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50b/v1",
-              OK
-            )
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/dac6/dct50b/v1",
+            OK
+          )
 
-            val result = connector.sendWithID(sub)
-            result.futureValue.status mustBe OK
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe OK
         }
       }
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
 
-        forAll(arbitrary[RegisterWithID]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50b/v1",
-              BAD_REQUEST
-            )
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/dac6/dct50b/v1",
+            BAD_REQUEST
+          )
 
-            val result = connector.sendWithID(sub)
-            result.futureValue.status mustBe BAD_REQUEST
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe BAD_REQUEST
         }
       }
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
 
-        forAll(arbitrary[RegisterWithID]) {
-          sub =>
-            stubResponse(
-              "/dac6/dct50b/v1",
-              INTERNAL_SERVER_ERROR
-            )
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/dac6/dct50b/v1",
+            INTERNAL_SERVER_ERROR
+          )
 
-            val result = connector.sendWithID(sub)
-            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
     }

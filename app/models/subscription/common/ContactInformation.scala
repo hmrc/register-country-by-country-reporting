@@ -52,16 +52,15 @@ object PrimaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )(
-      (organisation, email, phone, mobile) =>
-        PrimaryContact(
-          ContactInformationForOrganisation(
-            organisation,
-            email,
-            phone,
-            mobile
-          )
+    )((organisation, email, phone, mobile) =>
+      PrimaryContact(
+        ContactInformationForOrganisation(
+          organisation,
+          email,
+          phone,
+          mobile
         )
+      )
     )
   }
 
@@ -89,16 +88,15 @@ object SecondaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )(
-      (organisation, email, phone, mobile) =>
-        SecondaryContact(
-          ContactInformationForOrganisation(
-            organisation,
-            email,
-            phone,
-            mobile
-          )
+    )((organisation, email, phone, mobile) =>
+      SecondaryContact(
+        ContactInformationForOrganisation(
+          organisation,
+          email,
+          phone,
+          mobile
         )
+      )
     )
   }
 
