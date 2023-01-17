@@ -21,23 +21,25 @@ import play.api.libs.json._
 case class RegisterWithID(registerWithIDRequest: RegisterWithIDRequest)
 
 object RegisterWithID {
+
   implicit val format: Format[RegisterWithID] =
     Json.format[RegisterWithID]
 }
 
 case class RegisterWithIDRequest(
-    requestCommon: RequestCommon,
-    requestDetail: RequestWithIDDetails
+  requestCommon: RequestCommon,
+  requestDetail: RequestWithIDDetails
 )
 
 object RegisterWithIDRequest {
+
   implicit val format: Format[RegisterWithIDRequest] =
     Json.format[RegisterWithIDRequest]
 }
 
 case class WithIDOrganisation(
-    organisationName: String,
-    organisationType: String
+  organisationName: String,
+  organisationType: String
 )
 
 object WithIDOrganisation {
@@ -45,11 +47,11 @@ object WithIDOrganisation {
 }
 
 case class RequestWithIDDetails(
-    IDType: String,
-    IDNumber: String,
-    requiresNameMatch: Boolean,
-    isAnAgent: Boolean,
-    partnerDetails: WithIDOrganisation
+  IDType: String,
+  IDNumber: String,
+  requiresNameMatch: Boolean,
+  isAnAgent: Boolean,
+  partnerDetails: WithIDOrganisation
 )
 
 object RequestWithIDDetails {
@@ -62,25 +64,27 @@ object RequestWithIDDetails {
         (__ \ "requiresNameMatch").read[Boolean] and
         (__ \ "isAnAgent").read[Boolean] and
         (__ \ "organisation").read[WithIDOrganisation]
-    )((idType, idNumber, requiresNameMatch, isAnAgent, organisation) =>
-      RequestWithIDDetails(
-        idType,
-        idNumber,
-        requiresNameMatch,
-        isAnAgent,
-        organisation
-      )
+    )(
+      (idType, idNumber, requiresNameMatch, isAnAgent, organisation) =>
+        RequestWithIDDetails(
+          idType,
+          idNumber,
+          requiresNameMatch,
+          isAnAgent,
+          organisation
+        )
     )
   }
 
   implicit lazy val requestWithIDDetailsWrites: OWrites[RequestWithIDDetails] =
-    OWrites[RequestWithIDDetails] { idDetails =>
-      Json.obj(
-        "IDType" -> idDetails.IDType,
-        "IDNumber" -> idDetails.IDNumber,
-        "requiresNameMatch" -> idDetails.requiresNameMatch,
-        "isAnAgent" -> idDetails.isAnAgent,
-        "organisation" -> idDetails.partnerDetails
-      )
+    OWrites[RequestWithIDDetails] {
+      idDetails =>
+        Json.obj(
+          "IDType"            -> idDetails.IDType,
+          "IDNumber"          -> idDetails.IDNumber,
+          "requiresNameMatch" -> idDetails.requiresNameMatch,
+          "isAnAgent"         -> idDetails.isAnAgent,
+          "organisation"      -> idDetails.partnerDetails
+        )
     }
 }

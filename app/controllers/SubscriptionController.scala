@@ -15,6 +15,7 @@
  */
 
 package controllers
+
 /*
  * Copyright 2022 HM Revenue & Customs
  *
@@ -46,18 +47,17 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionController @Inject() (
-    val config: AppConfig,
-    authenticate: AuthAction,
-    subscriptionConnector: SubscriptionConnector,
-    override val controllerComponents: ControllerComponents
+  val config: AppConfig,
+  authenticate: AuthAction,
+  subscriptionConnector: SubscriptionConnector,
+  override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
 
   def createSubscription: Action[JsValue] = authenticate(parse.json).async {
     implicit request =>
-      val subscriptionSubmissionResult
-          : JsResult[CreateSubscriptionForCBCRequest] =
+      val subscriptionSubmissionResult: JsResult[CreateSubscriptionForCBCRequest] =
         request.body.validate[CreateSubscriptionForCBCRequest]
 
       subscriptionSubmissionResult.fold(
@@ -73,12 +73,13 @@ class SubscriptionController @Inject() (
   }
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
-    authenticate.async { implicit request =>
-      for {
-        response <- subscriptionConnector.readSubscriptionInformation(
-          DisplaySubscriptionForCBCRequest(safeId)
-        )
-      } yield convertToResult(response)(implicitly[Logger](logger))
+    authenticate.async {
+      implicit request =>
+        for {
+          response <- subscriptionConnector.readSubscriptionInformation(
+            DisplaySubscriptionForCBCRequest(safeId)
+          )
+        } yield convertToResult(response)(implicitly[Logger](logger))
     }
 
 }

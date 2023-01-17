@@ -17,11 +17,7 @@
 package connectors
 
 import base.{SpecBase, WireMockServerHandler}
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  aResponse,
-  post,
-  urlEqualTo
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import models.{RegisterWithID, RegisterWithoutId}
@@ -32,16 +28,12 @@ import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegistrationConnectorSpec
-    extends SpecBase
-    with WireMockServerHandler
-    with Generators
-    with ScalaCheckPropertyChecks {
+class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = applicationBuilder()
     .configure(
       "microservice.services.register-without-id.port" -> server.port(),
-      "microservice.services.register-with-id.port" -> server.port()
+      "microservice.services.register-with-id.port"    -> server.port()
     )
     .build()
 
@@ -52,40 +44,43 @@ class RegistrationConnectorSpec
     "for a registration without id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-        forAll(arbitrary[RegisterWithoutId]) { sub =>
-          stubResponse(
-            "/dac6/dct50a/v1",
-            OK
-          )
+        forAll(arbitrary[RegisterWithoutId]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50a/v1",
+              OK
+            )
 
-          val result = connector.sendWithoutIDInformation(sub)
-          result.futureValue.status mustBe OK
+            val result = connector.sendWithoutIDInformation(sub)
+            result.futureValue.status mustBe OK
         }
       }
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
 
-        forAll(arbitrary[RegisterWithoutId]) { sub =>
-          stubResponse(
-            "/dac6/dct50a/v1",
-            BAD_REQUEST
-          )
+        forAll(arbitrary[RegisterWithoutId]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50a/v1",
+              BAD_REQUEST
+            )
 
-          val result = connector.sendWithoutIDInformation(sub)
-          result.futureValue.status mustBe BAD_REQUEST
+            val result = connector.sendWithoutIDInformation(sub)
+            result.futureValue.status mustBe BAD_REQUEST
         }
       }
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
 
-        forAll(arbitrary[RegisterWithoutId]) { sub =>
-          stubResponse(
-            "/dac6/dct50a/v1",
-            INTERNAL_SERVER_ERROR
-          )
+        forAll(arbitrary[RegisterWithoutId]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50a/v1",
+              INTERNAL_SERVER_ERROR
+            )
 
-          val result = connector.sendWithoutIDInformation(sub)
-          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+            val result = connector.sendWithoutIDInformation(sub)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
@@ -93,48 +88,51 @@ class RegistrationConnectorSpec
     "for a registration with id submission" - {
       "must return status as OK for submission of Subscription" in {
 
-        forAll(arbitrary[RegisterWithID]) { sub =>
-          stubResponse(
-            "/dac6/dct50b/v1",
-            OK
-          )
+        forAll(arbitrary[RegisterWithID]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50b/v1",
+              OK
+            )
 
-          val result = connector.sendWithID(sub)
-          result.futureValue.status mustBe OK
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe OK
         }
       }
 
       "must return status as BAD_REQUEST for submission of invalid subscription" in {
 
-        forAll(arbitrary[RegisterWithID]) { sub =>
-          stubResponse(
-            "/dac6/dct50b/v1",
-            BAD_REQUEST
-          )
+        forAll(arbitrary[RegisterWithID]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50b/v1",
+              BAD_REQUEST
+            )
 
-          val result = connector.sendWithID(sub)
-          result.futureValue.status mustBe BAD_REQUEST
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe BAD_REQUEST
         }
       }
 
       "must return status as INTERNAL_SERVER_ERROR for submission for a technical error" in {
 
-        forAll(arbitrary[RegisterWithID]) { sub =>
-          stubResponse(
-            "/dac6/dct50b/v1",
-            INTERNAL_SERVER_ERROR
-          )
+        forAll(arbitrary[RegisterWithID]) {
+          sub =>
+            stubResponse(
+              "/dac6/dct50b/v1",
+              INTERNAL_SERVER_ERROR
+            )
 
-          val result = connector.sendWithID(sub)
-          result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+            val result = connector.sendWithID(sub)
+            result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
   }
 
   private def stubResponse(
-      expectedUrl: String,
-      expectedStatus: Int
+    expectedUrl: String,
+    expectedStatus: Int
   ): StubMapping =
     server.stubFor(
       post(urlEqualTo(expectedUrl))

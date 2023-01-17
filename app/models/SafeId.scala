@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsString, Reads, Writes, __}
+import play.api.libs.json.{__, JsString, Reads, Writes}
 import play.api.mvc.PathBindable
 
 case class SafeId(value: String)
@@ -25,10 +25,13 @@ object SafeId {
 
   implicit def reads: Reads[SafeId] = __.read[String] map SafeId.apply
 
-  implicit def writes: Writes[SafeId] = Writes(safeId => JsString(safeId.value))
+  implicit def writes: Writes[SafeId] = Writes(
+    safeId => JsString(safeId.value)
+  )
 
   implicit lazy val pathBindable: PathBindable[SafeId] =
     new PathBindable[SafeId] {
+
       override def bind(key: String, value: String): Either[String, SafeId] =
         implicitly[PathBindable[String]].bind(key, value).right.map(SafeId(_))
 

@@ -22,15 +22,13 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class AppConfig @Inject() (
-    config: Configuration,
-    servicesConfig: ServicesConfig
+  config: Configuration,
+  servicesConfig: ServicesConfig
 ) {
 
   def baseUrl(serviceName: String): String =
     s"${servicesConfig.baseUrl(serviceName)}${servicesConfig.getString(s"microservice.services.$serviceName.context")}"
 
-  val bearerToken: String => String = (serviceName: String) =>
-    config.get[String](s"microservice.services.$serviceName.bearer-token")
-  val environment: String => String = (serviceName: String) =>
-    config.get[String](s"microservice.services.$serviceName.environment")
+  val bearerToken: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.bearer-token")
+  val environment: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.environment")
 }

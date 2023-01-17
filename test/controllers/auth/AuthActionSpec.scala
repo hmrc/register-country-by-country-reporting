@@ -36,14 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class AuthActionSpec
-    extends PlaySpec
-    with GuiceOneAppPerSuite
-    with MockitoSugar {
+class AuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
 
   class Harness(authAction: AuthAction) extends InjectedController {
-    def onPageLoad(): Action[AnyContent] = authAction { _ =>
-      Ok
+
+    def onPageLoad(): Action[AnyContent] = authAction {
+      _ =>
+        Ok
     }
   }
 
@@ -73,7 +72,7 @@ class AuthActionSpec
 
         val authAction = application.injector.instanceOf[AuthAction]
         val controller = new Harness(authAction)
-        val result = controller.onPageLoad()(FakeRequest("", ""))
+        val result     = controller.onPageLoad()(FakeRequest("", ""))
         status(result) mustBe UNAUTHORIZED
 
       }

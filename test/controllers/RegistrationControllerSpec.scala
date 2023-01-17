@@ -36,14 +36,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationControllerSpec
-    extends SpecBase
-    with Generators
-    with ScalaCheckPropertyChecks {
+class RegistrationControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   val mockRegistrationConnector: RegistrationConnector =
     mock[RegistrationConnector]
+
   val application: Application = new GuiceApplicationBuilder()
     .configure(
       Configuration("metrics.enabled" -> "false", "auditing.enabled" -> false)
@@ -75,16 +73,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithoutId]) { individualNoIdRegistration =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithoutID
-            )
-              .withJsonBody(Json.toJson(individualNoIdRegistration))
+        forAll(arbitrary[RegisterWithoutId]) {
+          individualNoIdRegistration =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithoutID
+              )
+                .withJsonBody(Json.toJson(individualNoIdRegistration))
 
-          val result = route(application, request).value
-          status(result) mustEqual OK
+            val result = route(application, request).value
+            status(result) mustEqual OK
         }
       }
 
@@ -102,16 +101,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithoutId]) { individualNoIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithoutID
-            )
-              .withJsonBody(Json.toJson(individualNoIdSubscription))
+        forAll(arbitrary[RegisterWithoutId]) {
+          individualNoIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithoutID
+              )
+                .withJsonBody(Json.toJson(individualNoIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -129,16 +129,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithoutId]) { _ =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithoutID
-            )
-              .withJsonBody(Json.parse("""{"value": "field"}"""))
+        forAll(arbitrary[RegisterWithoutId]) {
+          _ =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithoutID
+              )
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
 
-          val result = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -156,16 +157,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithoutId]) { individualNoIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithoutID
-            )
-              .withJsonBody(Json.toJson(individualNoIdSubscription))
+        forAll(arbitrary[RegisterWithoutId]) {
+          individualNoIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithoutID
+              )
+                .withJsonBody(Json.toJson(individualNoIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual NOT_FOUND
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
         }
       }
 
@@ -183,16 +185,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithoutId]) { individualNoIdRegistration =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithoutID
-            )
-              .withJsonBody(Json.toJson(individualNoIdRegistration))
+        forAll(arbitrary[RegisterWithoutId]) {
+          individualNoIdRegistration =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithoutID
+              )
+                .withJsonBody(Json.toJson(individualNoIdRegistration))
 
-          val result = route(application, request).value
-          status(result) mustEqual FORBIDDEN
+            val result = route(application, request).value
+            status(result) mustEqual FORBIDDEN
         }
       }
     }
@@ -211,16 +214,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { withIDRegistration =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.toJson(withIDRegistration))
+        forAll(arbitrary[RegisterWithID]) {
+          withIDRegistration =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.toJson(withIDRegistration))
 
-          val result = route(application, request).value
-          status(result) mustEqual OK
+            val result = route(application, request).value
+            status(result) mustEqual OK
         }
       }
 
@@ -237,16 +241,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { withIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.toJson(withIdSubscription))
+        forAll(arbitrary[RegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.toJson(withIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -263,16 +268,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { _ =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.parse("""{"value": "field"}"""))
+        forAll(arbitrary[RegisterWithID]) {
+          _ =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.parse("""{"value": "field"}"""))
 
-          val result = route(application, request).value
-          status(result) mustEqual BAD_REQUEST
+            val result = route(application, request).value
+            status(result) mustEqual BAD_REQUEST
         }
       }
 
@@ -289,16 +295,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { withIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.toJson(withIdSubscription))
+        forAll(arbitrary[RegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.toJson(withIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual NOT_FOUND
+            val result = route(application, request).value
+            status(result) mustEqual NOT_FOUND
         }
       }
 
@@ -329,16 +336,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { withIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.toJson(withIdSubscription))
+        forAll(arbitrary[RegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.toJson(withIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual FORBIDDEN
+            val result = route(application, request).value
+            status(result) mustEqual FORBIDDEN
         }
       }
 
@@ -355,16 +363,17 @@ class RegistrationControllerSpec
             )
           )
 
-        forAll(arbitrary[RegisterWithID]) { withIdSubscription =>
-          val request =
-            FakeRequest(
-              POST,
-              routeWithID
-            )
-              .withJsonBody(Json.toJson(withIdSubscription))
+        forAll(arbitrary[RegisterWithID]) {
+          withIdSubscription =>
+            val request =
+              FakeRequest(
+                POST,
+                routeWithID
+              )
+                .withJsonBody(Json.toJson(withIdSubscription))
 
-          val result = route(application, request).value
-          status(result) mustEqual INTERNAL_SERVER_ERROR
+            val result = route(application, request).value
+            status(result) mustEqual INTERNAL_SERVER_ERROR
         }
       }
     }

@@ -23,18 +23,20 @@ sealed trait ContactInformation
 case class OrganisationDetails(organisationName: String)
 
 object OrganisationDetails {
+
   implicit val format: OFormat[OrganisationDetails] =
     Json.format[OrganisationDetails]
 }
 
 case class ContactInformationForOrganisation(
-    organisation: OrganisationDetails,
-    email: String,
-    phone: Option[String],
-    mobile: Option[String]
+  organisation: OrganisationDetails,
+  email: String,
+  phone: Option[String],
+  mobile: Option[String]
 ) extends ContactInformation
 
 object ContactInformationForOrganisation {
+
   implicit val format: OFormat[ContactInformationForOrganisation] =
     Json.format[ContactInformationForOrganisation]
 }
@@ -50,15 +52,16 @@ object PrimaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )((organisation, email, phone, mobile) =>
-      PrimaryContact(
-        ContactInformationForOrganisation(
-          organisation,
-          email,
-          phone,
-          mobile
+    )(
+      (organisation, email, phone, mobile) =>
+        PrimaryContact(
+          ContactInformationForOrganisation(
+            organisation,
+            email,
+            phone,
+            mobile
+          )
         )
-      )
     )
   }
 
@@ -86,15 +89,16 @@ object SecondaryContact {
         (__ \ "email").read[String] and
         (__ \ "phone").readNullable[String] and
         (__ \ "mobile").readNullable[String]
-    )((organisation, email, phone, mobile) =>
-      SecondaryContact(
-        ContactInformationForOrganisation(
-          organisation,
-          email,
-          phone,
-          mobile
+    )(
+      (organisation, email, phone, mobile) =>
+        SecondaryContact(
+          ContactInformationForOrganisation(
+            organisation,
+            email,
+            phone,
+            mobile
+          )
         )
-      )
     )
   }
 

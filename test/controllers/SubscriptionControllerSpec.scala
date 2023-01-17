@@ -37,15 +37,13 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionControllerSpec
-    extends SpecBase
-    with Generators
-    with ScalaCheckPropertyChecks {
+class SubscriptionControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   val mockSubscriptionConnector: SubscriptionConnector =
     mock[SubscriptionConnector]
+
   val application: Application = applicationBuilder()
     .overrides(
       bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),

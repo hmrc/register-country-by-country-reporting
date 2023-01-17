@@ -25,8 +25,9 @@ import uk.gov.hmrc.http.HttpResponse
 import scala.util.{Success, Try}
 
 package object controllers {
+
   def convertToResult(
-      httpResponse: HttpResponse
+    httpResponse: HttpResponse
   )(implicit logger: Logger): Result =
     httpResponse.status match {
       case OK        => Ok(httpResponse.body)
@@ -54,7 +55,7 @@ package object controllers {
     }
 
   private def logDownStreamError(
-      body: String
+    body: String
   )(implicit logger: Logger): Unit = {
     val error = Try(Json.parse(body).validate[ErrorDetails])
     error match {

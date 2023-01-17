@@ -31,10 +31,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
 class RegistrationController @Inject() (
-    val config: AppConfig,
-    authenticate: AuthAction,
-    registrationConnector: RegistrationConnector,
-    override val controllerComponents: ControllerComponents
+  val config: AppConfig,
+  authenticate: AuthAction,
+  registrationConnector: RegistrationConnector,
+  override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
