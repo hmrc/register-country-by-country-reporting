@@ -24,15 +24,16 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 case class RequestDetail(
-    IDType: String,
-    IDNumber: String,
-    tradingName: Option[String],
-    isGBUser: Boolean,
-    primaryContact: PrimaryContact,
-    secondaryContact: Option[SecondaryContact]
+  IDType: String,
+  IDNumber: String,
+  tradingName: Option[String],
+  isGBUser: Boolean,
+  primaryContact: PrimaryContact,
+  secondaryContact: Option[SecondaryContact]
 )
 
 object RequestDetail {
+
   implicit val requestDetailFormats: OFormat[RequestDetail] =
     Json.format[RequestDetail]
 }
@@ -40,22 +41,23 @@ object RequestDetail {
 case class RequestParameters(paramName: String, paramValue: String)
 
 object RequestParameters {
+
   implicit val formats: OFormat[RequestParameters] =
     Json.format[RequestParameters]
 }
 
 case class RequestCommonForSubscription(
-    regime: String,
-    conversationID: Option[String] = None,
-    receiptDate: String,
-    acknowledgementReference: String,
-    originatingSystem: String,
-    requestParameters: Option[Seq[RequestParameters]]
+  regime: String,
+  conversationID: Option[String] = None,
+  receiptDate: String,
+  acknowledgementReference: String,
+  originatingSystem: String,
+  requestParameters: Option[Seq[RequestParameters]]
 )
 
 object RequestCommonForSubscription {
-  implicit val requestCommonForSubscriptionFormats
-      : OFormat[RequestCommonForSubscription] =
+
+  implicit val requestCommonForSubscriptionFormats: OFormat[RequestCommonForSubscription] =
     Json.format[RequestCommonForSubscription]
 
   private val mdtp = "MDTP"
@@ -78,11 +80,12 @@ object RequestCommonForSubscription {
 }
 
 case class SubscriptionRequest(
-    requestCommon: RequestCommonForSubscription,
-    requestDetail: RequestDetail
+  requestCommon: RequestCommonForSubscription,
+  requestDetail: RequestDetail
 )
 
 object SubscriptionRequest {
+
   implicit val format: OFormat[SubscriptionRequest] =
     Json.format[SubscriptionRequest]
 }

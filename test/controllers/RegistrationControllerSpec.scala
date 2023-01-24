@@ -29,7 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{POST, route, status, _}
+import play.api.test.Helpers.{route, status, POST, _}
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -38,14 +38,12 @@ import java.time.format.DateTimeFormatter
 import java.time.{ZoneId, ZonedDateTime}
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationControllerSpec
-    extends SpecBase
-    with Generators
-    with ScalaCheckPropertyChecks {
+class RegistrationControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   val mockRegistrationConnector: RegistrationConnector =
     mock[RegistrationConnector]
+
   val application: Application = new GuiceApplicationBuilder()
     .configure(
       Configuration("metrics.enabled" -> "false", "auditing.enabled" -> false)

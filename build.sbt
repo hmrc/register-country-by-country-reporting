@@ -9,7 +9,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     majorVersion                     := 0,
-    scalaVersion                     := "2.13.8",
+    scalaVersion                     := "2.13.10",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     Compile / scalafmtOnCompile := true,
     Test / scalafmtOnCompile := true,
@@ -28,3 +28,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
+  .settings(ThisBuild / libraryDependencySchemes ++= Seq(
+    "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+  ))

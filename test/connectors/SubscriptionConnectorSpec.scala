@@ -17,11 +17,7 @@
 package connectors
 
 import base.{SpecBase, WireMockServerHandler}
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  aResponse,
-  post,
-  urlEqualTo
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import models.subscription.DisplaySubscriptionForCBCRequest
@@ -34,17 +30,13 @@ import play.api.http.Status.OK
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SubscriptionConnectorSpec
-    extends SpecBase
-    with WireMockServerHandler
-    with Generators
-    with ScalaCheckPropertyChecks {
+class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = applicationBuilder()
     .configure(
       conf = "microservice.services.create-subscription.port" -> server.port(),
       "microservice.services.create-subscription-cbc.port" -> server.port(),
-      "microservice.services.read-subscription.port" -> server.port()
+      "microservice.services.read-subscription.port"       -> server.port()
     )
     .build()
 
@@ -69,15 +61,14 @@ class SubscriptionConnectorSpec
 
       "must return an error status for submission of invalid subscription Data" in {
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest], errorCodes) {
-          (sub, errorCode) =>
-            stubResponse(
-              "/dac6/dct50c/v1",
-              errorCode
-            )
+        forAll(arbitrary[CreateSubscriptionForCBCRequest], errorCodes) { (sub, errorCode) =>
+          stubResponse(
+            "/dac6/dct50c/v1",
+            errorCode
+          )
 
-            val result = connector.sendSubscriptionInformation(sub)
-            result.futureValue.status mustBe errorCode
+          val result = connector.sendSubscriptionInformation(sub)
+          result.futureValue.status mustBe errorCode
         }
       }
     }
@@ -97,23 +88,22 @@ class SubscriptionConnectorSpec
 
       "must return an error status for  invalid read Subscription" in {
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) {
-          (sub, errorCode) =>
-            stubResponse(
-              "/dac6/dct50d/v1",
-              errorCode
-            )
+        forAll(arbitrary[DisplaySubscriptionForCBCRequest], errorCodes) { (sub, errorCode) =>
+          stubResponse(
+            "/dac6/dct50d/v1",
+            errorCode
+          )
 
-            val result = connector.readSubscriptionInformation(sub)
-            result.futureValue.status mustBe errorCode
+          val result = connector.readSubscriptionInformation(sub)
+          result.futureValue.status mustBe errorCode
         }
       }
     }
   }
 
   private def stubResponse(
-      expectedUrl: String,
-      expectedStatus: Int
+    expectedUrl: String,
+    expectedStatus: Int
   ): StubMapping =
     server.stubFor(
       post(urlEqualTo(expectedUrl))

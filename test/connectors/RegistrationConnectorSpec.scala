@@ -17,11 +17,7 @@
 package connectors
 
 import base.{SpecBase, WireMockServerHandler}
-import com.github.tomakehurst.wiremock.client.WireMock.{
-  aResponse,
-  post,
-  urlEqualTo
-}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
 import models.{RegisterWithID, RegisterWithoutId}
@@ -32,16 +28,12 @@ import play.api.http.Status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegistrationConnectorSpec
-    extends SpecBase
-    with WireMockServerHandler
-    with Generators
-    with ScalaCheckPropertyChecks {
+class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = applicationBuilder()
     .configure(
       "microservice.services.register-without-id.port" -> server.port(),
-      "microservice.services.register-with-id.port" -> server.port()
+      "microservice.services.register-with-id.port"    -> server.port()
     )
     .build()
 
@@ -133,8 +125,8 @@ class RegistrationConnectorSpec
   }
 
   private def stubResponse(
-      expectedUrl: String,
-      expectedStatus: Int
+    expectedUrl: String,
+    expectedStatus: Int
   ): StubMapping =
     server.stubFor(
       post(urlEqualTo(expectedUrl))

@@ -17,10 +17,7 @@
 package models.subscription
 
 import models.SafeId
-import models.subscription.request.{
-  RequestCommonForSubscription,
-  RequestParameters
-}
+import models.subscription.request.{RequestCommonForSubscription, RequestParameters}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
@@ -28,13 +25,17 @@ import play.api.libs.json.Json
 class DisplaySubscriptionForCBCRequestSpec extends AnyFreeSpec with Matchers {
 
   val safeId: SafeId = SafeId("number")
+
   val params: Option[Seq[RequestParameters]] = Some(
     Seq(RequestParameters("name", "value"))
   )
+
   val requestDetail: ReadSubscriptionRequestDetail =
     ReadSubscriptionRequestDetail("SAFE", "number")
+
   val requestCommon: RequestCommonForSubscription =
     RequestCommonForSubscription("regime", None, "date", "ref", "MDTP", params)
+
   val readSubscriptionRequest: DisplaySubscriptionDetails =
     DisplaySubscriptionDetails(requestCommon, requestDetail)
 

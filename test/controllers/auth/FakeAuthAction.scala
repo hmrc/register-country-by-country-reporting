@@ -22,12 +22,13 @@ import play.api.mvc.{BodyParsers, Request, Result}
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAuthAction @Inject() (
-    val parser: BodyParsers.Default
+  val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext)
     extends AuthAction {
+
   override def invokeBlock[A](
-      request: Request[A],
-      block: Request[A] => Future[Result]
+    request: Request[A],
+    block: Request[A] => Future[Result]
   ): Future[Result] =
     block(request)
 }

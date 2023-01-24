@@ -15,6 +15,7 @@
  */
 
 package controllers
+
 /*
  * Copyright 2022 HM Revenue & Customs
  *
@@ -46,30 +47,28 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionController @Inject() (
-    val config: AppConfig,
-    authenticate: AuthAction,
-    subscriptionConnector: SubscriptionConnector,
-    override val controllerComponents: ControllerComponents
+  val config: AppConfig,
+  authenticate: AuthAction,
+  subscriptionConnector: SubscriptionConnector,
+  override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
 
-  def createSubscription: Action[JsValue] = authenticate(parse.json).async {
-    implicit request =>
-      val subscriptionSubmissionResult
-          : JsResult[CreateSubscriptionForCBCRequest] =
-        request.body.validate[CreateSubscriptionForCBCRequest]
+  def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    val subscriptionSubmissionResult: JsResult[CreateSubscriptionForCBCRequest] =
+      request.body.validate[CreateSubscriptionForCBCRequest]
 
-      subscriptionSubmissionResult.fold(
-        invalid = _ =>
-          Future.successful(
-            BadRequest("CreateSubscriptionForCBCRequest is invalid")
-          ),
-        valid = sub =>
-          for {
-            response <- subscriptionConnector.sendSubscriptionInformation(sub)
-          } yield convertToResult(response)(implicitly[Logger](logger))
-      )
+    subscriptionSubmissionResult.fold(
+      invalid = _ =>
+        Future.successful(
+          BadRequest("CreateSubscriptionForCBCRequest is invalid")
+        ),
+      valid = sub =>
+        for {
+          response <- subscriptionConnector.sendSubscriptionInformation(sub)
+        } yield convertToResult(response)(implicitly[Logger](logger))
+    )
   }
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =

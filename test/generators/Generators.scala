@@ -28,10 +28,10 @@ trait Generators extends ModelGenerators {
   implicit val dontShrink: Shrink[String] = Shrink.shrinkAny
 
   def genIntersperseString(
-      gen: Gen[String],
-      value: String,
-      frequencyV: Int = 1,
-      frequencyN: Int = 10
+    gen: Gen[String],
+    value: String,
+    frequencyV: Int = 1,
+    frequencyN: Int = 10
   ): Gen[String] = {
 
     val genValue: Gen[Option[String]] =
@@ -40,13 +40,11 @@ trait Generators extends ModelGenerators {
     for {
       seq1 <- gen
       seq2 <- Gen.listOfN(seq1.length, genValue)
-    } yield {
-      seq1.toSeq.zip(seq2).foldRight("") {
-        case ((n, Some(v)), m) =>
-          m + n + v
-        case ((n, _), m) =>
-          m + n
-      }
+    } yield seq1.toSeq.zip(seq2).foldRight("") {
+      case ((n, Some(v)), m) =>
+        m + n + v
+      case ((n, _), m) =>
+        m + n
     }
   }
 
@@ -91,13 +89,13 @@ trait Generators extends ModelGenerators {
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     for {
       length <- choose(1, maxLength)
-      chars <- listOfN(length, arbitrary[Char])
+      chars  <- listOfN(length, arbitrary[Char])
     } yield chars.mkString
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     maxLength <- (minLength * 2).max(100)
-    length <- Gen.chooseNum(minLength + 1, maxLength)
-    chars <- listOfN(length, arbitrary[Char])
+    length    <- Gen.chooseNum(minLength + 1, maxLength)
+    chars     <- listOfN(length, arbitrary[Char])
   } yield chars.mkString
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
@@ -121,19 +119,19 @@ trait Generators extends ModelGenerators {
     }
   }
 
-  val apiContactNumberRegex = """[A-Z0-9 )/(\-*#+]{1,25}"""
+  val apiContactNumberRegex           = """[A-Z0-9 )/(\-*#+]{1,25}"""
   def validContactNumber: Gen[String] = RegexpGen.from(apiContactNumberRegex)
 
-  val subscriptionIDRegex = "^[X][A-Z][0-9]{13}"
+  val subscriptionIDRegex              = "^[X][A-Z][0-9]{13}"
   def validSubscriptionID: Gen[String] = RegexpGen.from(subscriptionIDRegex)
 
-  val safeIDRegex = "^[0-9A-Za-z]{1,15}"
+  val safeIDRegex              = "^[0-9A-Za-z]{1,15}"
   def validSafeID: Gen[String] = RegexpGen.from(safeIDRegex)
 
-  val utrRegex = "^[0-9]*$"
+  val utrRegex              = "^[0-9]*$"
   def validUtr: Gen[String] = RegexpGen.from(utrRegex)
 
-  val apiOrgName = "^([a-zA-Z0-9_.]{1,105})\\$"
+  val apiOrgName                = "^([a-zA-Z0-9_.]{1,105})\\$"
   def validOrgName: Gen[String] = RegexpGen.from(apiOrgName)
 
 }

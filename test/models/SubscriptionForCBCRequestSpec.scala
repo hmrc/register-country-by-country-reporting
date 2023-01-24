@@ -24,11 +24,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
 
-class SubscriptionForCBCRequestSpec
-    extends AnyFreeSpec
-    with Generators
-    with OptionValues
-    with Matchers {
+class SubscriptionForCBCRequestSpec extends AnyFreeSpec with Generators with OptionValues with Matchers {
 
   "SubscriptionForCBCRequest" - {
     "must serialise and de-serialise as expected" in {

@@ -23,18 +23,20 @@ sealed trait ContactInformation
 case class OrganisationDetails(organisationName: String)
 
 object OrganisationDetails {
+
   implicit val format: OFormat[OrganisationDetails] =
     Json.format[OrganisationDetails]
 }
 
 case class ContactInformationForOrganisation(
-    organisation: OrganisationDetails,
-    email: String,
-    phone: Option[String],
-    mobile: Option[String]
+  organisation: OrganisationDetails,
+  email: String,
+  phone: Option[String],
+  mobile: Option[String]
 ) extends ContactInformation
 
 object ContactInformationForOrganisation {
+
   implicit val format: OFormat[ContactInformationForOrganisation] =
     Json.format[ContactInformationForOrganisation]
 }

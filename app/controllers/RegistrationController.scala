@@ -31,37 +31,35 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
 class RegistrationController @Inject() (
-    val config: AppConfig,
-    authenticate: AuthAction,
-    registrationConnector: RegistrationConnector,
-    override val controllerComponents: ControllerComponents
+  val config: AppConfig,
+  authenticate: AuthAction,
+  registrationConnector: RegistrationConnector,
+  override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
 
-  def withoutOrgID: Action[JsValue] = authenticate(parse.json).async {
-    implicit request =>
-      logger.info("Organisation without ID")
-      request.body
-        .validate[RegisterWithoutId]
-        .fold(
-          _ => Future.successful(BadRequest("")),
-          sub =>
-            registrationConnector
-              .sendWithoutIDInformation(sub)
-              .map(convertToResult)
-        )
+  def withoutOrgID: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    logger.info("Organisation without ID")
+    request.body
+      .validate[RegisterWithoutId]
+      .fold(
+        _ => Future.successful(BadRequest("")),
+        sub =>
+          registrationConnector
+            .sendWithoutIDInformation(sub)
+            .map(convertToResult)
+      )
   }
 
-  def withOrgUTR: Action[JsValue] = authenticate(parse.json).async {
-    implicit request =>
-      logger.info("Organisation having UTR")
-      request.body
-        .validate[RegisterWithID]
-        .fold(
-          _ => Future.successful(BadRequest("")),
-          sub => registrationConnector.sendWithID(sub).map(convertToResult)
-        )
+  def withOrgUTR: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    logger.info("Organisation having UTR")
+    request.body
+      .validate[RegisterWithID]
+      .fold(
+        _ => Future.successful(BadRequest("")),
+        sub => registrationConnector.sendWithID(sub).map(convertToResult)
+      )
   }
 
   private def convertToResult(httpResponse: HttpResponse): Result =

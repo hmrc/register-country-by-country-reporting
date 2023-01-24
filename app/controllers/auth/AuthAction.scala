@@ -20,26 +20,22 @@ import com.google.inject.{ImplementedBy, Inject}
 import play.api.http.Status.UNAUTHORIZED
 import play.api.mvc.Results.Status
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.{
-  AuthConnector,
-  AuthorisedFunctions,
-  NoActiveSession
-}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionImpl @Inject() (
-    override val authConnector: AuthConnector,
-    val parser: BodyParsers.Default
+  override val authConnector: AuthConnector,
+  val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext)
     extends AuthAction
     with AuthorisedFunctions {
 
   override def invokeBlock[A](
-      request: Request[A],
-      block: Request[A] => Future[Result]
+    request: Request[A],
+    block: Request[A] => Future[Result]
   ): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
@@ -53,6 +49,4 @@ class AuthActionImpl @Inject() (
 }
 
 @ImplementedBy(classOf[AuthActionImpl])
-trait AuthAction
-    extends ActionBuilder[Request, AnyContent]
-    with ActionFunction[Request, Request]
+trait AuthAction extends ActionBuilder[Request, AnyContent] with ActionFunction[Request, Request]

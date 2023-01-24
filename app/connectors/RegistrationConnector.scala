@@ -24,12 +24,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConnector @Inject() (
-    val config: AppConfig,
-    val http: HttpClient
+  val config: AppConfig,
+  val http: HttpClient
 ) {
 
   def sendWithoutIDInformation(
-      registration: RegisterWithoutId
+    registration: RegisterWithoutId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "register-without-id"
     http.POST[RegisterWithoutId, HttpResponse](
@@ -40,7 +40,7 @@ class RegistrationConnector @Inject() (
   }
 
   def sendWithID(
-      registration: RegisterWithID
+    registration: RegisterWithID
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "register-with-id"
 

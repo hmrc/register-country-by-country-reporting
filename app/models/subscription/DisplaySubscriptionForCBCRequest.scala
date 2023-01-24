@@ -23,6 +23,7 @@ import play.api.libs.json.{Json, OFormat}
 case class ReadSubscriptionRequestDetail(IDType: String, IDNumber: String)
 
 object ReadSubscriptionRequestDetail {
+
   implicit val format: OFormat[ReadSubscriptionRequestDetail] =
     Json.format[ReadSubscriptionRequestDetail]
 
@@ -34,27 +35,28 @@ object ReadSubscriptionRequestDetail {
 }
 
 case class DisplaySubscriptionDetails(
-    requestCommon: RequestCommonForSubscription,
-    requestDetail: ReadSubscriptionRequestDetail
+  requestCommon: RequestCommonForSubscription,
+  requestDetail: ReadSubscriptionRequestDetail
 )
 
 object DisplaySubscriptionDetails {
+
   implicit val format: OFormat[DisplaySubscriptionDetails] =
     Json.format[DisplaySubscriptionDetails]
 
-  def apply(safeId: SafeId): DisplaySubscriptionDetails = {
+  def apply(safeId: SafeId): DisplaySubscriptionDetails =
     DisplaySubscriptionDetails(
       RequestCommonForSubscription.createRequestCommonForSubscription(),
       ReadSubscriptionRequestDetail(safeId)
     )
-  }
 }
 
 case class DisplaySubscriptionForCBCRequest(
-    displaySubscriptionForCBCRequest: DisplaySubscriptionDetails
+  displaySubscriptionForCBCRequest: DisplaySubscriptionDetails
 )
 
 object DisplaySubscriptionForCBCRequest {
+
   implicit val format: OFormat[DisplaySubscriptionForCBCRequest] =
     Json.format[DisplaySubscriptionForCBCRequest]
 

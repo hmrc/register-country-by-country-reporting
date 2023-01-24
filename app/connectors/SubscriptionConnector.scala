@@ -25,12 +25,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionConnector @Inject() (
-    val config: AppConfig,
-    val http: HttpClient
+  val config: AppConfig,
+  val http: HttpClient
 ) {
 
   def sendSubscriptionInformation(
-      subscription: CreateSubscriptionForCBCRequest
+    subscription: CreateSubscriptionForCBCRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "create-subscription"
     http.POST[CreateSubscriptionForCBCRequest, HttpResponse](
@@ -46,7 +46,7 @@ class SubscriptionConnector @Inject() (
   }
 
   def readSubscriptionInformation(
-      subscription: DisplaySubscriptionForCBCRequest
+    subscription: DisplaySubscriptionForCBCRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "read-subscription"
     http.POST[DisplaySubscriptionForCBCRequest, HttpResponse](
