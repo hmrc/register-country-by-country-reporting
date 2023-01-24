@@ -34,6 +34,8 @@ import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationControllerSpec
@@ -212,6 +214,42 @@ class RegistrationControllerSpec
           )
 
         forAll(arbitrary[RegisterWithID]) { withIDRegistration =>
+          println("************************************************")
+          val formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+          val x = RegisterWithoutId(
+            RegisterWithoutIDRequest(
+              RequestCommon(
+                ZonedDateTime
+                  .now(ZoneId.of("UTC"))
+                  .format(formatter),
+                "CBC",
+                "test-acknowledgement",
+                None
+              ),
+              RequestDetails(
+                NoIdOrganisation("test-OrgName"),
+                Address(
+                  "22 livingston road",
+                  Some("43"),
+                  "near A&E",
+                  Some("Oxford"),
+                  Some("OX2 3HD"),
+                  "GB"
+                ),
+                ContactDetails(
+                  Some("020947376"),
+                  Some("07634527721"),
+                  Some("02073648933"),
+                  Some("anr@wipro.com")
+                ),
+                Some(Identification("test-ID", "test-institution", "GB"))
+              )
+            )
+          )
+
+          println(Json.toJson(x))
+          println("************************************************")
           val request =
             FakeRequest(
               POST,
