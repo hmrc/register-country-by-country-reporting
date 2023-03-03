@@ -31,7 +31,10 @@ object SafeId {
     new PathBindable[SafeId] {
 
       override def bind(key: String, value: String): Either[String, SafeId] =
-        implicitly[PathBindable[String]].bind(key, value).right.map(SafeId(_))
+        implicitly[PathBindable[String]].bind(key, value) match {
+          case Left(error) => Left(error)
+          case Right(str)  => Right(SafeId(str))
+        }
 
       override def unbind(key: String, value: SafeId): String =
         value.value
