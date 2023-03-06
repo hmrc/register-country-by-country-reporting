@@ -15,6 +15,7 @@ lazy val microservice = Project(appName, file("."))
     Test / scalafmtOnCompile := true,
     PlayKeys.playDefaultPort := 10027,
     scalacOptions ++= Seq(
+      "-release", "11",
       "-Wconf:src=routes/.*:s",
       "-Wconf:src=.+/test/.+:s",
       "-Wconf:cat=deprecation&msg=\\.*()\\.*:s",

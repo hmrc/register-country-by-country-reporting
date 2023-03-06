@@ -66,7 +66,7 @@ trait Generators extends ModelGenerators {
     arbitrary[BigDecimal]
       .suchThat(_.abs < Int.MaxValue)
       .suchThat(!_.isValidInt)
-      .map(_.formatted("%f"))
+      .map(_.setScale(2).toString)
 
   def intsBelowValue(value: Int): Gen[Int] =
     arbitrary[Int] suchThat (_ < value)
