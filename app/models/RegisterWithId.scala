@@ -51,7 +51,7 @@ case class RequestWithIDDetails(
   IDNumber: String,
   requiresNameMatch: Boolean,
   isAnAgent: Boolean,
-  partnerDetails: WithIDOrganisation
+  partnerDetails: Option[WithIDOrganisation] = None
 )
 
 object RequestWithIDDetails {
@@ -65,24 +65,29 @@ object RequestWithIDDetails {
         (__ \ "isAnAgent").read[Boolean] and
         (__ \ "organisation").read[WithIDOrganisation]
     )((idType, idNumber, requiresNameMatch, isAnAgent, organisation) =>
-      RequestWithIDDetails(
-        idType,
-        idNumber,
-        requiresNameMatch,
-        isAnAgent,
-        organisation
-      )
+      organisation match {
+        case org => RequestWithIDDetails(idType, idNumber, requiresNameMatch, isAnAgent, Some(org))
+        case _   => RequestWithIDDetails(idType, idNumber, requiresNameMatch, isAnAgent)
+      }
     )
   }
 
   implicit lazy val requestWithIDDetailsWrites: OWrites[RequestWithIDDetails] =
-    OWrites[RequestWithIDDetails] { idDetails =>
-      Json.obj(
-        "IDType"            -> idDetails.IDType,
-        "IDNumber"          -> idDetails.IDNumber,
-        "requiresNameMatch" -> idDetails.requiresNameMatch,
-        "isAnAgent"         -> idDetails.isAnAgent,
-        "organisation"      -> idDetails.partnerDetails
-      )
+    OWrites[RequestWithIDDetails] {
+      case RequestWithIDDetails(idType, idNumber, requiresNameMatch, isAnAgent, Some(organisation @ WithIDOrganisation(_, _))) =>
+        Json.obj(
+          "IDType"            -> idType,
+          "IDNumber"          -> idNumber,
+          "requiresNameMatch" -> requiresNameMatch,
+          "isAnAgent"         -> isAnAgent,
+          "organisation"      -> organisation
+        )
+      case RequestWithIDDetails(idType, idNumber, requiresNameMatch, isAnAgent, None) =>
+        Json.obj(
+          "IDType"            -> idType,
+          "IDNumber"          -> idNumber,
+          "requiresNameMatch" -> requiresNameMatch,
+          "isAnAgent"         -> isAnAgent
+        )
     }
 }

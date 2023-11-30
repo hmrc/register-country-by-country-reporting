@@ -136,7 +136,7 @@ trait ModelGenerators {
         idNumber,
         requiresNameMatch,
         isAnAgent,
-        partnerDetails
+        Option(partnerDetails)
       )
     }
 
