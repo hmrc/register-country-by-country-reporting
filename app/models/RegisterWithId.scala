@@ -43,7 +43,7 @@ case class WithIDOrganisation(
 )
 
 object WithIDOrganisation {
-  implicit val format = Json.format[WithIDOrganisation]
+  implicit val format: OFormat[WithIDOrganisation] = Json.format[WithIDOrganisation]
 }
 
 case class RequestWithIDDetails(

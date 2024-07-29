@@ -16,7 +16,7 @@
 
 package controllers.auth
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import org.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

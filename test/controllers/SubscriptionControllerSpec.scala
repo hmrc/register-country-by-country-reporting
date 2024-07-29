@@ -23,7 +23,7 @@ import generators.Generators
 import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
-import org.joda.time.DateTime
+import org.apache.pekko.http.javadsl.model.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

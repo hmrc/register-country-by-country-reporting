@@ -21,7 +21,7 @@ import connectors.RegistrationConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models._
-import org.joda.time.DateTime
+import org.apache.pekko.http.javadsl.model.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -212,7 +212,6 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
           )
 
         forAll(arbitrary[RegisterWithID]) { withIDRegistration =>
-          println("************************************************")
           val formatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
           val x = RegisterWithoutId(
@@ -246,8 +245,6 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
             )
           )
 
-          println(Json.toJson(x))
-          println("************************************************")
           val request =
             FakeRequest(
               POST,
