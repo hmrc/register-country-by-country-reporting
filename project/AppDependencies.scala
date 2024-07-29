@@ -15,6 +15,6 @@ object AppDependencies {
   )
 
   val itDependencies: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion % Test
+    "uk.gov.hmrc" %% "bootstrap-test-play-30" % bootstrapVersion
   )
 }
