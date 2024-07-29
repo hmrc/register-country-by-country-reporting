@@ -20,45 +20,38 @@ import com.google.inject.Inject
 import config.AppConfig
 import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionConnector @Inject() (
   val config: AppConfig,
-  val http: HttpClient
+  val http: HttpClientV2
 ) {
 
   def sendSubscriptionInformation(
     subscription: CreateSubscriptionForCBCRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "create-subscription"
-    http.POST[CreateSubscriptionForCBCRequest, HttpResponse](
-      config.baseUrl(serviceName),
-      subscription,
-      headers = extraHeaders(config, serviceName)
-    )(
-      wts = CreateSubscriptionForCBCRequest.format,
-      rds = httpReads,
-      hc = hc,
-      ec = ec
-    )
+    http
+      .post(url"${config.baseUrl(serviceName)}")
+      .withBody(Json.toJson(subscription))
+      .setHeader(extraHeaders(config, serviceName): _*)
+      .execute[HttpResponse]
+
   }
 
   def readSubscriptionInformation(
     subscription: DisplaySubscriptionForCBCRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "read-subscription"
-    http.POST[DisplaySubscriptionForCBCRequest, HttpResponse](
-      config.baseUrl(serviceName),
-      subscription,
-      headers = extraHeaders(config, serviceName)
-    )(
-      wts = DisplaySubscriptionForCBCRequest.format,
-      rds = httpReads,
-      hc = hc,
-      ec = ec
-    )
-  }
+    http
+      .post(url"${config.baseUrl(serviceName)}")
+      .withBody(Json.toJson(subscription))
+      .setHeader(extraHeaders(config, serviceName): _*)
+      .execute[HttpResponse]
 
+  }
 }
