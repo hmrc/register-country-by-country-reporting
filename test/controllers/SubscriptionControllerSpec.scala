@@ -23,7 +23,6 @@ import generators.Generators
 import models.subscription.DisplaySubscriptionForCBCRequest
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
-import org.apache.pekko.http.javadsl.model.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -35,6 +34,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
+import java.time.ZonedDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
@@ -205,7 +205,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       "should return CONFLICT when one occurs" in {
         val errorDetails = ErrorDetails(
           ErrorDetail(
-            DateTime.now().toString,
+            ZonedDateTime.now().toString,
             Some("xx"),
             "409",
             "CONFLICT",

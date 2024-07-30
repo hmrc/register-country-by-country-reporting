@@ -21,7 +21,6 @@ import connectors.RegistrationConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
 import models._
-import org.apache.pekko.http.javadsl.model.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -29,7 +28,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, status, POST, _}
+import play.api.test.Helpers.{POST, route, status, _}
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -338,7 +337,7 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
       "should return forbidden error when authorisation is invalid" in {
         val errorDetails = ErrorDetails(
           ErrorDetail(
-            DateTime.now().toString,
+            ZonedDateTime.now().toString,
             Some("xx"),
             "403",
             "FORBIDDEN",
