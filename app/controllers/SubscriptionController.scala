@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,14 @@ import config.AppConfig
 import connectors.SubscriptionConnector
 import controllers.auth.AuthAction
 import models.SafeId
-import models.subscription.DisplaySubscriptionForCBCRequest
+import models.audit.{AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
-import play.api.libs.json.{JsResult, JsValue}
+import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
+import services.audit.AuditService
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,25 +53,23 @@ class SubscriptionController @Inject() (
   val config: AppConfig,
   authenticate: AuthAction,
   subscriptionConnector: SubscriptionConnector,
+  auditService: AuditService,
   override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
 
   def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
-    val subscriptionSubmissionResult: JsResult[CreateSubscriptionForCBCRequest] =
-      request.body.validate[CreateSubscriptionForCBCRequest]
-
-    subscriptionSubmissionResult.fold(
-      invalid = _ =>
-        Future.successful(
-          BadRequest("CreateSubscriptionForCBCRequest is invalid")
-        ),
-      valid = sub =>
-        for {
-          response <- subscriptionConnector.sendSubscriptionInformation(sub)
-        } yield convertToResult(response)(implicitly[Logger](logger))
-    )
+    request.body
+      .validate[CreateSubscriptionForCBCRequest]
+      .fold(
+        invalid = _ => Future.successful(BadRequest("CreateSubscriptionForCBCRequest is invalid")),
+        valid = subscriptionRequest =>
+          for {
+            response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
+            _        <- if (response.status == OK) sendAuditEvent(subscriptionRequest, response) else Future.unit
+          } yield convertToResult(response)(implicitly[Logger](logger))
+      )
   }
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
@@ -79,5 +80,22 @@ class SubscriptionController @Inject() (
         )
       } yield convertToResult(response)(implicitly[Logger](logger))
     }
+
+  private def sendAuditEvent(
+    subscriptionRequest: CreateSubscriptionForCBCRequest,
+    subscriptionResponse: HttpResponse
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    subscriptionResponse.json
+      .validate[CreateSubscriptionResponse]
+      .fold(
+        invalid = _ => {
+          logger.warn("Failed to validate subscription create response")
+          Future.unit
+        },
+        valid = subscriptionResponse => {
+          val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+          auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+        }
+      )
 
 }

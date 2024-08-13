@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,31 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models.subscription.DisplaySubscriptionForCBCRequest
+import models.audit.{AuditType, SubscriptionAuditDetails}
+import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => mEq}
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.audit.AuditService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import java.time.ZonedDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionControllerSpec extends SpecBase with Generators with ScalaCheckPropertyChecks {
+class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with Generators with ScalaCheckPropertyChecks {
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  val mockAuditService: AuditService   = mock[AuditService]
 
   val mockSubscriptionConnector: SubscriptionConnector =
     mock[SubscriptionConnector]
@@ -48,14 +53,52 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
     .overrides(
       bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
       bind[AuthConnector].toInstance(mockAuthConnector),
+      bind[AuditService].toInstance(mockAuditService),
       bind[AuthAction].to[FakeAuthAction]
     )
     .build()
 
+  override def beforeEach(): Unit = reset(mockAuthConnector, mockAuditService, mockSubscriptionConnector)
+
   "SubscriptionController" - {
 
     "createSubscription" - {
-      "should return BAD_REQUEST when subscriptionForCBCRequest ia invalid" in {
+      "should create a subscription and send an audit event" in {
+        forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest, subscriptionResponse: CreateSubscriptionResponse) =>
+          val subscriptionAuditDetails = SubscriptionAuditDetails
+            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+
+          val subscriptionEventDetail = Json.toJson(subscriptionAuditDetails)
+
+          when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(HttpResponse(OK, Json.toJson(subscriptionResponse), Map.empty)))
+
+          when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), mEq(subscriptionEventDetail))(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
+          val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
+            .withJsonBody(Json.toJson(subscriptionRequest))
+
+          val result = route(application, request).value
+          status(result) mustEqual OK
+        }
+      }
+
+      "should return OK but not send audit when subscription request returns OK status but response could not be validated" in {
+        forAll { subscriptionRequest: CreateSubscriptionForCBCRequest =>
+          when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.successful(HttpResponse(OK, Json.parse("{}"), Map.empty)))
+
+          val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
+            .withJsonBody(Json.toJson(subscriptionRequest))
+
+          val result = route(application, request).value
+          status(result) mustEqual OK
+          verifyZeroInteractions(mockAuditService)
+        }
+      }
+
+      "should return BAD_REQUEST when subscriptionForCBCRequest is invalid" in {
         when(
           mockSubscriptionConnector
             .sendSubscriptionInformation(
@@ -80,6 +123,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
         val result = route(application, request).value
         status(result) mustEqual BAD_REQUEST
+        verifyZeroInteractions(mockAuditService)
       }
 
       "should return BAD_REQUEST when one is encountered" in {
@@ -108,6 +152,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual BAD_REQUEST
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -137,6 +182,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual FORBIDDEN
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -166,6 +212,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual SERVICE_UNAVAILABLE
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -199,6 +246,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual INTERNAL_SERVER_ERROR
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -242,6 +290,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual CONFLICT
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -271,6 +320,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual NOT_FOUND
+          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -300,6 +350,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
           val result = route(application, request).value
           status(result) mustEqual SERVICE_UNAVAILABLE
+          verifyZeroInteractions(mockAuditService)
         }
       }
     }
