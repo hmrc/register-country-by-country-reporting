@@ -51,7 +51,7 @@ class AuditService @Inject() (
           case Failure(msg, _) =>
             logger.warn(s"Failed to send audit event $eventName: $msg")
           case Disabled =>
-            logger.warn(s"Failed to send audit event $eventName: Auditing is disabled")
+            logger.debug(s"Failed to send audit event $eventName: Auditing is disabled")
           case Success =>
             logger.info(s"Audit event $eventName sent")
           case unexpected =>

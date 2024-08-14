@@ -17,7 +17,7 @@
 package generators
 
 import models._
-import models.audit.{SubscriptionAuditDetails, SubscriptionResponseAuditDetails}
+import models.audit.SubscriptionAuditDetails
 import models.subscription.common._
 import models.subscription.request._
 import models.subscription._
@@ -274,19 +274,7 @@ trait ModelGenerators {
     Arbitrary {
       for {
         request  <- arbitrary[CreateSubscriptionForCBCRequest]
-        response <- arbitrary[CreateSubscriptionForCBCResponse]
-      } yield SubscriptionAuditDetails(
-        idType = request.createSubscriptionForCBCRequest.requestDetail.IDType,
-        idNumber = request.createSubscriptionForCBCRequest.requestDetail.IDNumber,
-        isGBUser = request.createSubscriptionForCBCRequest.requestDetail.isGBUser,
-        primaryContact = request.createSubscriptionForCBCRequest.requestDetail.primaryContact,
-        secondaryContact = request.createSubscriptionForCBCRequest.requestDetail.secondaryContact,
-        tradingName = request.createSubscriptionForCBCRequest.requestDetail.tradingName,
-        response = SubscriptionResponseAuditDetails(
-          subscriptionID = response.responseDetail.subscriptionID,
-          status = response.responseCommon.status,
-          processingDate = response.responseCommon.processingDate
-        )
-      )
+        response <- arbitrary[CreateSubscriptionResponse]
+      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response)
     }
 }
