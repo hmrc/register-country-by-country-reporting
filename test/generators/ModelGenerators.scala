@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package generators
 
 import models._
+import models.audit.SubscriptionAuditDetails
 import models.subscription.common._
 import models.subscription.request._
-import models.subscription.{DisplaySubscriptionDetails, DisplaySubscriptionForCBCRequest, ReadSubscriptionRequestDetail}
+import models.subscription._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
 trait ModelGenerators {
   self: Generators =>
@@ -245,5 +246,35 @@ trait ModelGenerators {
       } yield DisplaySubscriptionForCBCRequest(
         DisplaySubscriptionDetails(requestCommon, requestDetail)
       )
+    }
+
+  implicit val arbitraryCreateSubscriptionForCBCResponseCommon: Arbitrary[ResponseCommon] =
+    Arbitrary {
+      for {
+        status         <- arbitrary[String]
+        processingDate <- arbitrary[LocalDateTime]
+      } yield ResponseCommon(status, processingDate)
+    }
+
+  implicit val arbitraryCreateSubscriptionForCBCResponseDetail: Arbitrary[ResponseDetail] =
+    Arbitrary(validSubscriptionID.map(ResponseDetail.apply))
+
+  implicit val arbitraryCreateSubscriptionForCBCResponse: Arbitrary[CreateSubscriptionForCBCResponse] =
+    Arbitrary {
+      for {
+        responseDetail <- arbitrary[ResponseDetail]
+        responseCommon <- arbitrary[ResponseCommon]
+      } yield CreateSubscriptionForCBCResponse(responseCommon, responseDetail)
+    }
+
+  implicit val arbitraryCreateSubscriptionResponse: Arbitrary[CreateSubscriptionResponse] =
+    Arbitrary(arbitrary[CreateSubscriptionForCBCResponse].map(CreateSubscriptionResponse.apply))
+
+  implicit val arbitrarySubscriptionAuditDetails: Arbitrary[SubscriptionAuditDetails] =
+    Arbitrary {
+      for {
+        request  <- arbitrary[CreateSubscriptionForCBCRequest]
+        response <- arbitrary[CreateSubscriptionResponse]
+      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response)
     }
 }
