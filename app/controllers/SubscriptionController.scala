@@ -60,9 +60,9 @@ class SubscriptionController @Inject() (
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
     authenticate.async { implicit request =>
-        subscriptionConnector
-          .readSubscriptionInformation(DisplaySubscriptionForCBCRequest(safeId))
-          .map(convertToResult(_))
+      subscriptionConnector
+        .readSubscriptionInformation(DisplaySubscriptionForCBCRequest(safeId))
+        .map(convertToResult(_))
     }
 
   private def sendAuditEvent(
