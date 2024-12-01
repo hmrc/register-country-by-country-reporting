@@ -20,6 +20,7 @@ import models.subscription.CreateSubscriptionResponse
 import models.subscription.common.{PrimaryContact, SecondaryContact}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 final case class SubscriptionAuditDetails(
   idType: String,
@@ -28,7 +29,8 @@ final case class SubscriptionAuditDetails(
   primaryContact: PrimaryContact,
   response: SubscriptionResponseAuditDetails,
   tradingName: Option[String],
-  secondaryContact: Option[SecondaryContact]
+  secondaryContact: Option[SecondaryContact],
+  userType: Option[AffinityGroup] = None
 )
 
 object SubscriptionAuditDetails {
@@ -36,7 +38,8 @@ object SubscriptionAuditDetails {
 
   def fromSubscriptionRequestAndResponse(
     request: CreateSubscriptionForCBCRequest,
-    response: CreateSubscriptionResponse
+    response: CreateSubscriptionResponse,
+    userType: AffinityGroup
   ): SubscriptionAuditDetails = {
     val requestDetail              = request.createSubscriptionForCBCRequest.requestDetail
     val createSubscriptionResponse = response.createSubscriptionForCBCResponse
@@ -52,7 +55,8 @@ object SubscriptionAuditDetails {
         createSubscriptionResponse.responseCommon.processingDate
       ),
       requestDetail.tradingName,
-      requestDetail.secondaryContact
+      requestDetail.secondaryContact,
+      Some(userType)
     )
   }
 }

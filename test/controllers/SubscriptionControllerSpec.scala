@@ -18,14 +18,13 @@ package controllers
 
 import base.SpecBase
 import connectors.SubscriptionConnector
-import controllers.auth.{AuthAction, FakeAuthAction}
+import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import generators.Generators
 import models.audit.{AuditType, SubscriptionAuditDetails}
-import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import models.subscription.request.CreateSubscriptionForCBCRequest
+import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => mEq}
+import org.mockito.ArgumentMatchers.{any, eq => mEq}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -35,7 +34,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.audit.AuditService
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import java.time.ZonedDateTime
@@ -54,7 +53,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
       bind[AuthConnector].toInstance(mockAuthConnector),
       bind[AuditService].toInstance(mockAuditService),
-      bind[AuthAction].to[FakeAuthAction]
+      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
     )
     .build()
 
@@ -66,7 +65,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       "should create a subscription and send an audit event" in {
         forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest, subscriptionResponse: CreateSubscriptionResponse) =>
           val subscriptionAuditDetails = SubscriptionAuditDetails
-            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, AffinityGroup.Organisation)
 
           val subscriptionEventDetail = Json.toJson(subscriptionAuditDetails)
 

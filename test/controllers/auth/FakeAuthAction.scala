@@ -18,6 +18,7 @@ package controllers.auth
 
 import com.google.inject.Inject
 import play.api.mvc.{BodyParsers, Request, Result}
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,4 +32,13 @@ class FakeAuthAction @Inject() (
     block: Request[A] => Future[Result]
   ): Future[Result] =
     block(request)
+}
+
+class FakeIdentifierAuthAction @Inject() (
+  val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext)
+    extends IdentifierAuthAction {
+
+  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
+    block(IdentifierRequest(request, Organisation))
 }
