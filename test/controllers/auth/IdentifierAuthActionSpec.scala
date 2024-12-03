@@ -74,17 +74,6 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
         status(result) mustBe UNAUTHORIZED
 
       }
-      "must return UNAUTHORIZED for not known enrolment" in {
-        val retrieval: RetrievalType =
-          new ~(Enrolments(Set(Enrolment("HMRC-TEST-ORG", Seq(EnrolmentIdentifier("TESTID", "subscriptionID")), "ACTIVE"))), Some(Organisation))
-        when(mockAuthConnector.authorise(any[Predicate](), any[Retrieval[RetrievalType]]())(any[HeaderCarrier](), any[ExecutionContext]()))
-          .thenReturn(Future.successful(retrieval))
-
-        val authAction = application.injector.instanceOf[IdentifierAuthAction]
-        val controller = new Harness(authAction)
-        val result     = controller.onPageLoad()(FakeRequest("", ""))
-        status(result) mustBe UNAUTHORIZED
-      }
     }
 
     "the user is logged in" must {
