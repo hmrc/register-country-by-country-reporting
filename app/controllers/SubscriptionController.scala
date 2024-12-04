@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.SubscriptionConnector
-import controllers.auth.AuthAction
+import controllers.auth.IdentifierAuthAction
 import models.SafeId
 import models.audit.{AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
@@ -28,6 +28,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
 import services.audit.AuditService
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionController @Inject() (
   val config: AppConfig,
-  authenticate: AuthAction,
+  authenticate: IdentifierAuthAction,
   subscriptionConnector: SubscriptionConnector,
   auditService: AuditService,
   override val controllerComponents: ControllerComponents
@@ -53,7 +54,7 @@ class SubscriptionController @Inject() (
         valid = subscriptionRequest =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
-            _        <- if (response.status == OK) sendAuditEvent(subscriptionRequest, response) else Future.unit
+            _        <- if (response.status == OK) sendAuditEvent(request.affinityGroup, subscriptionRequest, response) else Future.unit
           } yield convertToResult(response)
       )
   }
@@ -66,6 +67,7 @@ class SubscriptionController @Inject() (
     }
 
   private def sendAuditEvent(
+    userType: AffinityGroup,
     subscriptionRequest: CreateSubscriptionForCBCRequest,
     subscriptionResponse: HttpResponse
   )(implicit hc: HeaderCarrier): Future[Unit] =
@@ -77,7 +79,7 @@ class SubscriptionController @Inject() (
           Future.unit
         },
         valid = subscriptionResponse => {
-          val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+          val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, userType)
           auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
         }
       )

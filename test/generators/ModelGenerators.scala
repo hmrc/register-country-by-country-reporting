@@ -23,6 +23,7 @@ import models.subscription.request._
 import models.subscription._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -275,6 +276,17 @@ trait ModelGenerators {
       for {
         request  <- arbitrary[CreateSubscriptionForCBCRequest]
         response <- arbitrary[CreateSubscriptionResponse]
-      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response)
+        affinity <- arbitrary[AffinityGroup]
+      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response, affinity)
     }
+
+  implicit val arbitraryAffinityGroup: Arbitrary[AffinityGroup] = Arbitrary {
+    Gen.oneOf(
+      Seq(
+        AffinityGroup.Organisation,
+        AffinityGroup.Individual,
+        AffinityGroup.Agent
+      )
+    )
+  }
 }
