@@ -33,6 +33,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class SubscriptionController @Inject() (
   val config: AppConfig,
@@ -54,7 +55,7 @@ class SubscriptionController @Inject() (
         valid = subscriptionRequest =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
-            _        <- if (response.status == OK) sendAuditEvent(request.affinityGroup, subscriptionRequest, response) else Future.unit
+            _        <- sendAuditEvent(request.affinityGroup, subscriptionRequest, response)
           } yield convertToResult(response)
       )
   }
@@ -71,17 +72,20 @@ class SubscriptionController @Inject() (
     subscriptionRequest: CreateSubscriptionForCBCRequest,
     subscriptionResponse: HttpResponse
   )(implicit hc: HeaderCarrier): Future[Unit] =
-    subscriptionResponse.json
-      .validate[CreateSubscriptionResponse]
-      .fold(
-        invalid = _ => {
-          logger.warn("Failed to validate subscription create response")
-          Future.unit
-        },
-        valid = subscriptionResponse => {
-          val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, userType)
-          auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
-        }
+    Try(subscriptionResponse.json)
+      .map(
+        _.validate[CreateSubscriptionResponse]
+          .fold(
+            invalid = _ => {
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json, userType)
+              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+            },
+            valid = subscriptionResponse => {
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, userType)
+              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+            }
+          )
       )
+      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body)))
 
 }

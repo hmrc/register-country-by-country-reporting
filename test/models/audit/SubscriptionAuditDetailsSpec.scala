@@ -27,10 +27,10 @@ class SubscriptionAuditDetailsSpec extends AnyFreeSpec with Generators with Opti
 
   "SubscriptionAuditDetails" - {
     "must serialise and de-serialise as expected" in {
-      forAll { subscriptionAuditDetails: SubscriptionAuditDetails =>
+      forAll { subscriptionAuditDetails: SubscriptionAuditDetails[SubscriptionResponseAuditDetails] =>
         Json
           .toJson(subscriptionAuditDetails)
-          .as[SubscriptionAuditDetails] mustBe subscriptionAuditDetails
+          .as[SubscriptionAuditDetails[SubscriptionResponseAuditDetails]] mustBe subscriptionAuditDetails
       }
     }
   }
