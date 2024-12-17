@@ -30,7 +30,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.inject.bind
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.audit.AuditService
@@ -87,13 +87,14 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
         forAll { subscriptionRequest: CreateSubscriptionForCBCRequest =>
           when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(HttpResponse(OK, Json.parse("{}"), Map.empty)))
+          when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
 
           val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
             .withJsonBody(Json.toJson(subscriptionRequest))
 
           val result = route(application, request).value
           status(result) mustEqual OK
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -141,6 +142,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -151,7 +155,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual BAD_REQUEST
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -171,6 +174,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -181,7 +187,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual FORBIDDEN
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -201,6 +206,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -211,7 +219,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual SERVICE_UNAVAILABLE
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -235,6 +242,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -245,7 +255,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual INTERNAL_SERVER_ERROR
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -279,6 +288,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -289,7 +301,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual CONFLICT
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -309,6 +320,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -319,7 +333,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual NOT_FOUND
-          verifyZeroInteractions(mockAuditService)
         }
       }
 
@@ -339,6 +352,9 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             )
           )
 
+        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.unit)
+
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
@@ -349,7 +365,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
           val result = route(application, request).value
           status(result) mustEqual SERVICE_UNAVAILABLE
-          verifyZeroInteractions(mockAuditService)
         }
       }
     }

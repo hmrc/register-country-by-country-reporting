@@ -21,7 +21,7 @@ import config.AppConfig
 import play.api.http.Status.UNAUTHORIZED
 import play.api.mvc.Results.Status
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.Agent
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~

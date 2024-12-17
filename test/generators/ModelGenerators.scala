@@ -17,7 +17,7 @@
 package generators
 
 import models._
-import models.audit.SubscriptionAuditDetails
+import models.audit.{SubscriptionAuditDetails, SubscriptionResponseAuditDetails}
 import models.subscription.common._
 import models.subscription.request._
 import models.subscription._
@@ -271,7 +271,7 @@ trait ModelGenerators {
   implicit val arbitraryCreateSubscriptionResponse: Arbitrary[CreateSubscriptionResponse] =
     Arbitrary(arbitrary[CreateSubscriptionForCBCResponse].map(CreateSubscriptionResponse.apply))
 
-  implicit val arbitrarySubscriptionAuditDetails: Arbitrary[SubscriptionAuditDetails] =
+  implicit val arbitrarySubscriptionAuditDetails: Arbitrary[SubscriptionAuditDetails[SubscriptionResponseAuditDetails]] =
     Arbitrary {
       for {
         request  <- arbitrary[CreateSubscriptionForCBCRequest]
