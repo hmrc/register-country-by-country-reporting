@@ -86,6 +86,6 @@ class SubscriptionController @Inject() (
             }
           )
       )
-      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body)))
+      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body, "userType" -> userType)))
 
 }
