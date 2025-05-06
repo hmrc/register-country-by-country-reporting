@@ -18,9 +18,9 @@ package generators
 
 import models._
 import models.audit.{SubscriptionAuditDetails, SubscriptionResponseAuditDetails}
+import models.subscription._
 import models.subscription.common._
 import models.subscription.request._
-import models.subscription._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import uk.gov.hmrc.auth.core.AffinityGroup
@@ -29,6 +29,9 @@ import java.time.{LocalDate, LocalDateTime}
 
 trait ModelGenerators {
   self: Generators =>
+
+  def nonEmptyString: Gen[String] =
+    arbitrary[String] suchThat (_.nonEmpty)
 
   implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
     datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
