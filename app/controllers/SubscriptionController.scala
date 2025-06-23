@@ -28,7 +28,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
 import services.audit.AuditService
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -55,7 +54,7 @@ class SubscriptionController @Inject() (
         valid = subscriptionRequest =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
-            _        <- sendAuditEvent(request.affinityGroup, subscriptionRequest, response)
+            _        <- sendAuditEvent(subscriptionRequest, response)
           } yield convertToResult(response)
       )
   }
@@ -68,7 +67,6 @@ class SubscriptionController @Inject() (
     }
 
   private def sendAuditEvent(
-    userType: AffinityGroup,
     subscriptionRequest: CreateSubscriptionForCBCRequest,
     subscriptionResponse: HttpResponse
   )(implicit hc: HeaderCarrier): Future[Unit] =
@@ -77,15 +75,15 @@ class SubscriptionController @Inject() (
         _.validate[CreateSubscriptionResponse]
           .fold(
             invalid = _ => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json, userType)
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json)
               auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
             },
             valid = subscriptionResponse => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, userType)
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
               auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
             }
           )
       )
-      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body, "userType" -> userType)))
+      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body)))
 
 }

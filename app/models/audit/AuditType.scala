@@ -17,5 +17,5 @@
 package models.audit
 
 object AuditType {
-  val SubscriptionEvent = "CountryByCountryReportingSubscription"
+  val SubscriptionEvent = "Subscription"
 }

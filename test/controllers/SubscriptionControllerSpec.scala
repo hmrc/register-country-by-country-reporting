@@ -65,7 +65,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       "should create a subscription and send an audit event" in {
         forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest, subscriptionResponse: CreateSubscriptionResponse) =>
           val subscriptionAuditDetails = SubscriptionAuditDetails
-            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, AffinityGroup.Organisation)
+            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
 
           val subscriptionEventDetail = Json.toJson(subscriptionAuditDetails)
 
