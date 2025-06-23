@@ -17,8 +17,8 @@
 package services.audit
 
 import config.AppConfig
+import models.audit.Audit
 import play.api.Logging
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
@@ -33,7 +33,7 @@ class AuditService @Inject() (
   auditConnector: AuditConnector
 ) extends Logging {
 
-  def sendAuditEvent(eventName: String, detail: JsValue)(implicit
+  def sendAuditEvent(auditDetail: Audit)(implicit
     hc: HeaderCarrier,
     ex: ExecutionContext
   ): Future[Unit] =
@@ -41,21 +41,21 @@ class AuditService @Inject() (
       .sendExtendedEvent(
         ExtendedDataEvent(
           auditSource = appConfig.appName,
-          auditType = eventName,
-          detail = detail,
+          auditType = auditDetail.eventName,
+          detail = auditDetail.details,
           tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
         )
       )
       .map { auditResult: AuditResult =>
         auditResult match {
           case Failure(msg, _) =>
-            logger.warn(s"Failed to send audit event $eventName: $msg")
+            logger.warn(s"Failed to send audit event $auditDetail.eventName: $msg")
           case Disabled =>
-            logger.debug(s"Failed to send audit event $eventName: Auditing is disabled")
+            logger.debug(s"Failed to send audit event $auditDetail.eventName: Auditing is disabled")
           case Success =>
-            logger.info(s"Audit event $eventName sent")
+            logger.info(s"Audit event $auditDetail.eventName sent")
           case unexpected =>
-            logger.warn(s"Unexpected audit result $unexpected received for event $eventName")
+            logger.warn(s"Unexpected audit result $unexpected received for event $auditDetail.eventName")
         }
       }
 }

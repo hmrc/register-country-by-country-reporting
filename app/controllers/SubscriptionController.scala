@@ -21,7 +21,7 @@ import config.AppConfig
 import connectors.SubscriptionConnector
 import controllers.auth.IdentifierAuthAction
 import models.SafeId
-import models.audit.{AuditType, SubscriptionAuditDetails}
+import models.audit.{Audit, AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import play.api.libs.json.{JsValue, Json}
@@ -76,14 +76,14 @@ class SubscriptionController @Inject() (
           .fold(
             invalid = _ => {
               val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json)
-              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+              auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             },
             valid = subscriptionResponse => {
               val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
-              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+              auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             }
           )
       )
-      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body)))
+      .getOrElse(auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body))))
 
 }
