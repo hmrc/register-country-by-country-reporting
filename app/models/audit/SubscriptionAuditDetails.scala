@@ -43,7 +43,8 @@ object SubscriptionAuditDetails {
 
   def fromSubscriptionRequestAndResponse(
     request: CreateSubscriptionForCBCRequest,
-    response: CreateSubscriptionResponse
+    response: CreateSubscriptionResponse,
+    businessName: String
   ): SubscriptionAuditDetails[SubscriptionResponseAuditDetails] = {
     val requestDetail              = request.createSubscriptionForCBCRequest.requestDetail
     val createSubscriptionResponse = response.createSubscriptionForCBCResponse
@@ -61,8 +62,8 @@ object SubscriptionAuditDetails {
       idType = requestDetail.IDType,
       idNumber = requestDetail.IDNumber,
       isGBUser = requestDetail.isGBUser,
-      organisationName = firstContactInfo._1,
-      firstContactName = firstContactInfo._1, //no access to this?
+      organisationName = businessName,
+      firstContactName = firstContactInfo._1,
       firstContactEmail = firstContactInfo._2,
       firstContactPhoneNumber = firstContactInfo._3,
       secondContactName = secondContactInfo.map(_._1),
@@ -80,7 +81,8 @@ object SubscriptionAuditDetails {
 
   def fromSubscriptionRequestAndResponse(
     request: CreateSubscriptionForCBCRequest,
-    response: JsValue
+    response: JsValue,
+    businessName: String
   ): SubscriptionAuditDetails[JsValue] = {
     val requestDetail = request.createSubscriptionForCBCRequest.requestDetail
     val firstContactInfo = requestDetail.primaryContact.contactInformation match {
@@ -95,8 +97,8 @@ object SubscriptionAuditDetails {
       idType = requestDetail.IDType,
       idNumber = requestDetail.IDNumber,
       isGBUser = requestDetail.isGBUser,
-      organisationName = firstContactInfo._1,
-      firstContactName = firstContactInfo._1, //no access to this?
+      organisationName = businessName,
+      firstContactName = firstContactInfo._1,
       firstContactEmail = firstContactInfo._2,
       firstContactPhoneNumber = firstContactInfo._3,
       secondContactName = secondContactInfo.map(_._1),

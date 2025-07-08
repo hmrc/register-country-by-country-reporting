@@ -47,6 +47,8 @@ class SubscriptionController @Inject() (
   implicit private val logging: Logger = logger
 
   def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    val businessName: String = request.headers.get("X-Business-Name").getOrElse("Missing business name")
+
     request.body
       .validate[CreateSubscriptionForCBCRequest]
       .fold(
@@ -54,7 +56,7 @@ class SubscriptionController @Inject() (
         valid = subscriptionRequest =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
-            _        <- sendAuditEvent(subscriptionRequest, response)
+            _        <- sendAuditEvent(subscriptionRequest, response, businessName)
           } yield convertToResult(response)
       )
   }
@@ -68,18 +70,19 @@ class SubscriptionController @Inject() (
 
   private def sendAuditEvent(
     subscriptionRequest: CreateSubscriptionForCBCRequest,
-    subscriptionResponse: HttpResponse
+    subscriptionResponse: HttpResponse,
+    businessName: String
   )(implicit hc: HeaderCarrier): Future[Unit] =
     Try(subscriptionResponse.json)
       .map(
         _.validate[CreateSubscriptionResponse]
           .fold(
             invalid = _ => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json)
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json, businessName)
               auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             },
             valid = subscriptionResponse => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, businessName)
               auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             }
           )
