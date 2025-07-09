@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import generators.Generators
-import models.audit.{AuditType, SubscriptionAuditDetails}
+import models.audit.{Audit, AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
@@ -34,7 +34,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.audit.AuditService
-import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import java.time.ZonedDateTime
@@ -44,7 +44,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockAuditService: AuditService   = mock[AuditService]
-
   val mockSubscriptionConnector: SubscriptionConnector =
     mock[SubscriptionConnector]
 
@@ -59,23 +58,27 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
   override def beforeEach(): Unit = reset(mockAuthConnector, mockAuditService, mockSubscriptionConnector)
 
+  private val businessName = "Some Business Name"
+
   "SubscriptionController" - {
 
     "createSubscription" - {
       "should create a subscription and send an audit event" in {
         forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest, subscriptionResponse: CreateSubscriptionResponse) =>
           val subscriptionAuditDetails = SubscriptionAuditDetails
-            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, AffinityGroup.Organisation)
+            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, businessName)
 
           val subscriptionEventDetail = Json.toJson(subscriptionAuditDetails)
+          val auditDetail             = Audit(AuditType.SubscriptionEvent, subscriptionEventDetail)
 
           when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(HttpResponse(OK, Json.toJson(subscriptionResponse), Map.empty)))
 
-          when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), mEq(subscriptionEventDetail))(any[HeaderCarrier], any[ExecutionContext]))
+          when(mockAuditService.sendAuditEvent(mEq(auditDetail))(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.unit)
 
           val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
+            .withHeaders("X-Business-Name" -> businessName)
             .withJsonBody(Json.toJson(subscriptionRequest))
 
           val result = route(application, request).value
@@ -87,7 +90,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
         forAll { subscriptionRequest: CreateSubscriptionForCBCRequest =>
           when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(HttpResponse(OK, Json.parse("{}"), Map.empty)))
-          when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.unit)
 
           val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
@@ -127,25 +130,25 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return BAD_REQUEST when one is encountered" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])
-            )
-          )
-
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
-
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(400, Json.obj(), Map.empty[String, Seq[String]])
+              )
+            )
+
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
           val request =
             FakeRequest(
               POST,
@@ -159,25 +162,25 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return FORBIDDEN when authorisation is invalid" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])
-            )
-          )
-
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
-
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(403, Json.obj(), Map.empty[String, Seq[String]])
+              )
+            )
+
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
           val request =
             FakeRequest(
               POST,
@@ -191,25 +194,25 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return SERVICE_UNAVAILABLE when EIS becomes unavailable" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(503, Json.obj(), Map.empty[String, Seq[String]])
-            )
-          )
-
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
-
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(503, Json.obj(), Map.empty[String, Seq[String]])
+              )
+            )
+
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
           val request =
             FakeRequest(
               POST,
@@ -223,29 +226,29 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return INTERNAL_SERVER_ERROR when EIS fails" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_GATEWAY,
-                Json.obj(),
-                Map.empty[String, Seq[String]]
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(
+                  BAD_GATEWAY,
+                  Json.obj(),
+                  Map.empty[String, Seq[String]]
+                )
               )
             )
-          )
 
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
               POST,
@@ -269,29 +272,29 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             Some(SourceFaultDetail(Seq("a", "b")))
           )
         )
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                409,
-                Json.toJson(errorDetails),
-                Map.empty[String, Seq[String]]
+        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(
+                  409,
+                  Json.toJson(errorDetails),
+                  Map.empty[String, Seq[String]]
+                )
               )
             )
-          )
 
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
           val request =
             FakeRequest(
               POST,
@@ -305,25 +308,25 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return NOT_FOUND for unspecified errors" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])
-            )
-          )
-
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
-
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(404, Json.obj(), Map.empty[String, Seq[String]])
+              )
+            )
+
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
           val request =
             FakeRequest(
               POST,
@@ -337,25 +340,25 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "downstream errors should be recoverable when not in json" in {
-        when(
-          mockSubscriptionConnector
-            .sendSubscriptionInformation(
-              any[CreateSubscriptionForCBCRequest]()
-            )(
-              any[HeaderCarrier](),
-              any[ExecutionContext]()
-            )
-        )
-          .thenReturn(
-            Future.successful(
-              HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])
-            )
-          )
-
-        when(mockAuditService.sendAuditEvent(mEq(AuditType.SubscriptionEvent), any[JsValue])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.unit)
-
         forAll(arbitrary[CreateSubscriptionForCBCRequest]) { subscriptionForCBCRequest =>
+          when(
+            mockSubscriptionConnector
+              .sendSubscriptionInformation(
+                any[CreateSubscriptionForCBCRequest]()
+              )(
+                any[HeaderCarrier](),
+                any[ExecutionContext]()
+              )
+          )
+            .thenReturn(
+              Future.successful(
+                HttpResponse(503, "Not Available", Map.empty[String, Seq[String]])
+              )
+            )
+
+          when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
+            .thenReturn(Future.unit)
+
           val request =
             FakeRequest(
               POST,

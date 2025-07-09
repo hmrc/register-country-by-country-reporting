@@ -17,20 +17,23 @@
 package models.audit
 
 import models.subscription.CreateSubscriptionResponse
-import models.subscription.common.{PrimaryContact, SecondaryContact}
+import models.subscription.common.ContactInformationForOrganisation
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import play.api.libs.json.{JsValue, Json, OFormat}
-import uk.gov.hmrc.auth.core.AffinityGroup
 
 final case class SubscriptionAuditDetails[T](
   idType: String,
   idNumber: String,
   isGBUser: Boolean,
-  primaryContact: PrimaryContact,
+  organisationName: String,
+  firstContactName: String,
+  firstContactEmail: String,
+  firstContactPhoneNumber: Option[String],
+  secondContactName: Option[String],
+  secondaryContactEmail: Option[String],
+  secondContactPhoneNumber: Option[String],
   response: T,
-  tradingName: Option[String],
-  secondaryContact: Option[SecondaryContact],
-  userType: Option[AffinityGroup] = None
+  tradingName: Option[String]
 )
 
 object SubscriptionAuditDetails {
@@ -41,43 +44,68 @@ object SubscriptionAuditDetails {
   def fromSubscriptionRequestAndResponse(
     request: CreateSubscriptionForCBCRequest,
     response: CreateSubscriptionResponse,
-    userType: AffinityGroup
+    businessName: String
   ): SubscriptionAuditDetails[SubscriptionResponseAuditDetails] = {
     val requestDetail              = request.createSubscriptionForCBCRequest.requestDetail
     val createSubscriptionResponse = response.createSubscriptionForCBCResponse
 
+    val firstContactInfo = requestDetail.primaryContact.contactInformation match {
+      case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
+        (organisation.organisationName, email, phone.orElse(mobile))
+    }
+    val secondContactInfo: Option[(String, String, Option[String])] = requestDetail.secondaryContact.map(_.contactInformation match {
+      case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
+        (organisation.organisationName, email, phone.orElse(mobile))
+    })
+
     SubscriptionAuditDetails(
-      requestDetail.IDType,
-      requestDetail.IDNumber,
-      requestDetail.isGBUser,
-      requestDetail.primaryContact,
+      idType = requestDetail.IDType,
+      idNumber = requestDetail.IDNumber,
+      isGBUser = requestDetail.isGBUser,
+      organisationName = businessName,
+      firstContactName = firstContactInfo._1,
+      firstContactEmail = firstContactInfo._2,
+      firstContactPhoneNumber = firstContactInfo._3,
+      secondContactName = secondContactInfo.map(_._1),
+      secondaryContactEmail = secondContactInfo.map(_._2),
+      secondContactPhoneNumber = secondContactInfo.flatMap(_._3),
       response = SubscriptionResponseAuditDetails(
-        createSubscriptionResponse.responseDetail.subscriptionID,
-        createSubscriptionResponse.responseCommon.status,
-        createSubscriptionResponse.responseCommon.processingDate
+        Some(createSubscriptionResponse.responseDetail.subscriptionID),
+        createSubscriptionResponse.responseCommon.processingDate,
+        Some(createSubscriptionResponse.responseCommon.status)
       ),
-      requestDetail.tradingName,
-      requestDetail.secondaryContact,
-      Some(userType)
+      tradingName = requestDetail.tradingName
     )
+
   }
 
   def fromSubscriptionRequestAndResponse(
     request: CreateSubscriptionForCBCRequest,
     response: JsValue,
-    userType: AffinityGroup
+    businessName: String
   ): SubscriptionAuditDetails[JsValue] = {
     val requestDetail = request.createSubscriptionForCBCRequest.requestDetail
-
+    val firstContactInfo = requestDetail.primaryContact.contactInformation match {
+      case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
+        (organisation.organisationName, email, phone.orElse(mobile))
+    }
+    val secondContactInfo: Option[(String, String, Option[String])] = requestDetail.secondaryContact.map(_.contactInformation match {
+      case ContactInformationForOrganisation(organisation, email, phone, mobile) =>
+        (organisation.organisationName, email, phone.orElse(mobile))
+    })
     SubscriptionAuditDetails(
-      requestDetail.IDType,
-      requestDetail.IDNumber,
-      requestDetail.isGBUser,
-      requestDetail.primaryContact,
+      idType = requestDetail.IDType,
+      idNumber = requestDetail.IDNumber,
+      isGBUser = requestDetail.isGBUser,
+      organisationName = businessName,
+      firstContactName = firstContactInfo._1,
+      firstContactEmail = firstContactInfo._2,
+      firstContactPhoneNumber = firstContactInfo._3,
+      secondContactName = secondContactInfo.map(_._1),
+      secondaryContactEmail = secondContactInfo.map(_._2),
+      secondContactPhoneNumber = secondContactInfo.flatMap(_._3),
       response = response,
-      requestDetail.tradingName,
-      requestDetail.secondaryContact,
-      Some(userType)
+      tradingName = requestDetail.tradingName
     )
   }
 }

@@ -24,7 +24,6 @@ lazy val microservice = Project(appName, file("."))
       "-Wconf:cat=unused-imports&src=routes/.*:s"
     )
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(ThisBuild / libraryDependencySchemes ++= Seq(
     "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always

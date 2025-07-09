@@ -16,6 +16,15 @@
 
 package models.audit
 
+import play.api.libs.json.{JsValue, Json, OFormat}
+
 object AuditType {
-  val SubscriptionEvent = "CountryByCountryReportingSubscription"
+  val SubscriptionEvent = "Subscription"
+}
+
+final case class Audit(eventName: String, details: JsValue)
+
+object Audit {
+
+  implicit val format: OFormat[Audit] = Json.format[Audit]
 }

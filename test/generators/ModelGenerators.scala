@@ -277,10 +277,10 @@ trait ModelGenerators {
   implicit val arbitrarySubscriptionAuditDetails: Arbitrary[SubscriptionAuditDetails[SubscriptionResponseAuditDetails]] =
     Arbitrary {
       for {
-        request  <- arbitrary[CreateSubscriptionForCBCRequest]
-        response <- arbitrary[CreateSubscriptionResponse]
-        affinity <- arbitrary[AffinityGroup]
-      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response, affinity)
+        request      <- arbitrary[CreateSubscriptionForCBCRequest]
+        response     <- arbitrary[CreateSubscriptionResponse]
+        businessName <- nonEmptyString
+      } yield SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(request, response, businessName)
     }
 
   implicit val arbitraryAffinityGroup: Arbitrary[AffinityGroup] = Arbitrary {

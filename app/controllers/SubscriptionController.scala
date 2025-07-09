@@ -21,14 +21,13 @@ import config.AppConfig
 import connectors.SubscriptionConnector
 import controllers.auth.IdentifierAuthAction
 import models.SafeId
-import models.audit.{AuditType, SubscriptionAuditDetails}
+import models.audit.{Audit, AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
 import services.audit.AuditService
-import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -48,6 +47,8 @@ class SubscriptionController @Inject() (
   implicit private val logging: Logger = logger
 
   def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    val businessName: String = request.headers.get("X-Business-Name").getOrElse("Missing business name")
+
     request.body
       .validate[CreateSubscriptionForCBCRequest]
       .fold(
@@ -55,7 +56,7 @@ class SubscriptionController @Inject() (
         valid = subscriptionRequest =>
           for {
             response <- subscriptionConnector.sendSubscriptionInformation(subscriptionRequest)
-            _        <- sendAuditEvent(request.affinityGroup, subscriptionRequest, response)
+            _        <- sendAuditEvent(subscriptionRequest, response, businessName)
           } yield convertToResult(response)
       )
   }
@@ -68,24 +69,24 @@ class SubscriptionController @Inject() (
     }
 
   private def sendAuditEvent(
-    userType: AffinityGroup,
     subscriptionRequest: CreateSubscriptionForCBCRequest,
-    subscriptionResponse: HttpResponse
+    subscriptionResponse: HttpResponse,
+    businessName: String
   )(implicit hc: HeaderCarrier): Future[Unit] =
     Try(subscriptionResponse.json)
       .map(
         _.validate[CreateSubscriptionResponse]
           .fold(
             invalid = _ => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json, userType)
-              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse.json, businessName)
+              auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             },
             valid = subscriptionResponse => {
-              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, userType)
-              auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail))
+              val auditEventDetail = SubscriptionAuditDetails.fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, businessName)
+              auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.toJson(auditEventDetail)))
             }
           )
       )
-      .getOrElse(auditService.sendAuditEvent(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body, "userType" -> userType)))
+      .getOrElse(auditService.sendAuditEvent(Audit(AuditType.SubscriptionEvent, Json.obj("response" -> subscriptionResponse.body))))
 
 }

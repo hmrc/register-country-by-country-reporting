@@ -19,6 +19,7 @@ package services.audit
 import base.SpecBase
 import config.AppConfig
 import generators.Generators
+import models.audit.Audit
 import models.subscription.request.RequestDetail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -52,7 +53,7 @@ class AuditServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
         when(mockAuditConnector.sendExtendedEvent(auditEventArgCaptor.capture())(any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(AuditResult.Success))
 
-        noException should be thrownBy auditService.sendAuditEvent(eventName, eventDetail).futureValue
+        noException should be thrownBy auditService.sendAuditEvent(Audit(eventName, eventDetail)).futureValue
 
         val event = auditEventArgCaptor.getValue
         event.auditSource mustBe appConfig.appName
@@ -68,7 +69,7 @@ class AuditServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
           .thenReturn(Future.successful(AuditResult.Disabled))
 
         noException should be thrownBy auditService
-          .sendAuditEvent(eventName, Json.toJson(createSubscriptionRequestDetail))
+          .sendAuditEvent(Audit(eventName, Json.toJson(createSubscriptionRequestDetail)))
           .futureValue
       }
     }
@@ -79,7 +80,7 @@ class AuditServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
           .thenReturn(Future.successful(AuditResult.Failure("Audit failed")))
 
         noException should be thrownBy auditService
-          .sendAuditEvent(eventName, Json.toJson(createSubscriptionRequestDetail))
+          .sendAuditEvent(Audit(eventName, Json.toJson(createSubscriptionRequestDetail)))
           .futureValue
       }
     }
