@@ -44,7 +44,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockAuditService: AuditService   = mock[AuditService]
-
   val mockSubscriptionConnector: SubscriptionConnector =
     mock[SubscriptionConnector]
 
@@ -59,13 +58,15 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
   override def beforeEach(): Unit = reset(mockAuthConnector, mockAuditService, mockSubscriptionConnector)
 
+  private val businessName = "Some Business Name"
+
   "SubscriptionController" - {
 
     "createSubscription" - {
       "should create a subscription and send an audit event" in {
         forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest, subscriptionResponse: CreateSubscriptionResponse) =>
           val subscriptionAuditDetails = SubscriptionAuditDetails
-            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse)
+            .fromSubscriptionRequestAndResponse(subscriptionRequest, subscriptionResponse, businessName)
 
           val subscriptionEventDetail = Json.toJson(subscriptionAuditDetails)
           val auditDetail             = Audit(AuditType.SubscriptionEvent, subscriptionEventDetail)
@@ -77,6 +78,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
             .thenReturn(Future.unit)
 
           val request = FakeRequest(POST, routes.SubscriptionController.createSubscription.url)
+            .withHeaders("X-Business-Name" -> businessName)
             .withJsonBody(Json.toJson(subscriptionRequest))
 
           val result = route(application, request).value
