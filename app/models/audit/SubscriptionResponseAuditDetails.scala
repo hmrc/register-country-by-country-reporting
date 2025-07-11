@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDateTime
 
 final case class SubscriptionResponseAuditDetails(
-  subscriptionID: Option[String] = Some("failure"),
+  subscriptionID: Option[String],
   processingDate: LocalDateTime,
   failureMessage: Option[String]
 )

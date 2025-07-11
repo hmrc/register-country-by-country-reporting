@@ -28,6 +28,7 @@ final case class SubscriptionAuditDetails[T](
   organisationName: String,
   firstContactName: String,
   firstContactEmail: String,
+  hasSecondContact: Boolean,
   firstContactPhoneNumber: Option[String],
   secondContactName: Option[String],
   secondaryContactEmail: Option[String],
@@ -66,13 +67,14 @@ object SubscriptionAuditDetails {
       firstContactName = firstContactInfo._1,
       firstContactEmail = firstContactInfo._2,
       firstContactPhoneNumber = firstContactInfo._3,
+      hasSecondContact = secondContactInfo.isDefined,
       secondContactName = secondContactInfo.map(_._1),
       secondaryContactEmail = secondContactInfo.map(_._2),
       secondContactPhoneNumber = secondContactInfo.flatMap(_._3),
       response = SubscriptionResponseAuditDetails(
         Some(createSubscriptionResponse.responseDetail.subscriptionID),
         createSubscriptionResponse.responseCommon.processingDate,
-        Some(createSubscriptionResponse.responseCommon.status)
+        Option.when(createSubscriptionResponse.responseCommon.status != "OK")(createSubscriptionResponse.responseCommon.status)
       ),
       tradingName = requestDetail.tradingName
     )
@@ -101,6 +103,7 @@ object SubscriptionAuditDetails {
       firstContactName = firstContactInfo._1,
       firstContactEmail = firstContactInfo._2,
       firstContactPhoneNumber = firstContactInfo._3,
+      hasSecondContact = secondContactInfo.isDefined,
       secondContactName = secondContactInfo.map(_._1),
       secondaryContactEmail = secondContactInfo.map(_._2),
       secondContactPhoneNumber = secondContactInfo.flatMap(_._3),
