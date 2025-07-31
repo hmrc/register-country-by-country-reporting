@@ -21,6 +21,8 @@ import models.subscription.common.ContactInformationForOrganisation
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import play.api.libs.json.{JsValue, Json, OFormat}
 
+import java.time.format.DateTimeFormatter
+
 final case class SubscriptionAuditDetails[T](
   idType: String,
   idNumber: String,
@@ -73,7 +75,7 @@ object SubscriptionAuditDetails {
       secondContactPhoneNumber = secondContactInfo.flatMap(_._3),
       response = SubscriptionResponseAuditDetails(
         Some(createSubscriptionResponse.responseDetail.subscriptionID),
-        createSubscriptionResponse.responseCommon.processingDate,
+        createSubscriptionResponse.responseCommon.processingDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
         Option.when(createSubscriptionResponse.responseCommon.status != "OK")(createSubscriptionResponse.responseCommon.status)
       ),
       tradingName = requestDetail.tradingName

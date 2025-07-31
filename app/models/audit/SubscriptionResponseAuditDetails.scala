@@ -18,11 +18,9 @@ package models.audit
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDateTime
-
 final case class SubscriptionResponseAuditDetails(
   subscriptionID: Option[String],
-  processingDate: LocalDateTime,
+  processingDate: String,
   failureMessage: Option[String]
 )
 
