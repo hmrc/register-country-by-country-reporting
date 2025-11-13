@@ -23,6 +23,7 @@ import models.audit.Audit
 import models.subscription.request.RequestDetail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.{inject, Application}
 import play.api.libs.json.Json

@@ -20,17 +20,19 @@ import base.SpecBase
 import connectors.RegistrationConnector
 import controllers.auth.{AuthAction, FakeAuthAction}
 import generators.Generators
-import models._
+import models.*
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{route, status, POST, _}
+import play.api.test.Helpers._
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HttpVerbs.POST
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import java.time.format.DateTimeFormatter
