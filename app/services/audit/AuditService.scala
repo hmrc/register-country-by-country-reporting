@@ -46,16 +46,12 @@ class AuditService @Inject() (
           tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
         )
       )
-      .map { auditResult: AuditResult =>
-        auditResult match {
-          case Failure(msg, _) =>
-            logger.warn(s"Failed to send audit event $auditDetail.eventName: $msg")
-          case Disabled =>
-            logger.debug(s"Failed to send audit event $auditDetail.eventName: Auditing is disabled")
-          case Success =>
-            logger.info(s"Audit event $auditDetail.eventName sent")
-          case unexpected =>
-            logger.warn(s"Unexpected audit result $unexpected received for event $auditDetail.eventName")
-        }
+      .map {
+        case Failure(msg, _) =>
+          logger.warn(s"Failed to send audit event $auditDetail.eventName: $msg")
+        case Disabled =>
+          logger.debug(s"Failed to send audit event $auditDetail.eventName: Auditing is disabled")
+        case Success =>
+          logger.info(s"Audit event $auditDetail.eventName sent")
       }
 }

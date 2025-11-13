@@ -3,7 +3,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 
 val appName = "register-country-by-country-reporting"
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.5"
 val silencerVersion = "1.7.7"
 
 lazy val microservice = Project(appName, file("."))
@@ -16,15 +16,15 @@ lazy val microservice = Project(appName, file("."))
     scalacOptions ++= Seq(
       "-release", "11",
       "-Wconf:src=routes/.*:s",
-      "-Wconf:src=.+/test/.+:s",
-      "-Wconf:cat=deprecation&msg=\\.*()\\.*:s",
-      "-Wconf:cat=unused-imports&site=<empty>:s",
-      "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
-      "-Wconf:cat=unused&src=.*Routes\\.scala:s",
-      "-Wconf:cat=unused-imports&src=routes/.*:s"
-    )
+      "-Wconf:src=.*/Routes.scala:s",
+      "-Wconf:src=.*/RoutesPrefix.scala:s",
+      "-Wconf:src=.*/ReverseRoutes.scala:s",
+      "-Wconf:src=.*/test/.*:s",
+      "-Wconf:cat=deprecation:s"
+    ),
+    scalacOptions := scalacOptions.value.distinct
   )
-  .settings(CodeCoverageSettings.settings: _*)
+  .settings(CodeCoverageSettings.settings *)
   .settings(ThisBuild / libraryDependencySchemes ++= Seq(
     "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
   ))
@@ -32,5 +32,8 @@ lazy val microservice = Project(appName, file("."))
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
-  .settings(DefaultBuildSettings.itSettings())
+  .settings(
+    DefaultBuildSettings.itSettings(),
+    scalacOptions := scalacOptions.value.distinct
+  )
   .settings(libraryDependencies ++= AppDependencies.itDependencies)

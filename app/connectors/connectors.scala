@@ -60,7 +60,7 @@ package object connectors {
     eisEnvironment: String
   )(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
 
-    //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
+    // HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
     val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
 
     Seq(

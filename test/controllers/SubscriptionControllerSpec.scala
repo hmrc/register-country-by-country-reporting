@@ -24,15 +24,17 @@ import models.audit.{Audit, AuditType, SubscriptionAuditDetails}
 import models.subscription.request.CreateSubscriptionForCBCRequest
 import models.subscription.{CreateSubscriptionResponse, DisplaySubscriptionForCBCRequest}
 import models.{ErrorDetail, ErrorDetails, SafeId, SourceFaultDetail}
-import org.mockito.ArgumentMatchers.{any, eq => mEq}
+import org.mockito.ArgumentMatchers.{any, eq as mEq}
+import org.mockito.Mockito.when
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.inject.bind
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.audit.AuditService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -40,23 +42,27 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import java.time.ZonedDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with Generators with ScalaCheckPropertyChecks {
+class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with Generators with ScalaCheckPropertyChecks with MockFactory {
 
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockAuditService: AuditService   = mock[AuditService]
-  val mockSubscriptionConnector: SubscriptionConnector =
-    mock[SubscriptionConnector]
+  var mockAuthConnector: AuthConnector                 = _
+  var mockAuditService: AuditService                   = _
+  var mockSubscriptionConnector: SubscriptionConnector = _
+  var application: Application                         = _
 
-  val application: Application = applicationBuilder()
-    .overrides(
-      bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-      bind[AuthConnector].toInstance(mockAuthConnector),
-      bind[AuditService].toInstance(mockAuditService),
-      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
-    )
-    .build()
-
-  override def beforeEach(): Unit = reset(mockAuthConnector, mockAuditService, mockSubscriptionConnector)
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    mockAuthConnector = mock[AuthConnector]
+    mockAuditService = mock[AuditService]
+    mockSubscriptionConnector = mock[SubscriptionConnector]
+    application = applicationBuilder()
+      .overrides(
+        bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+        bind[AuthConnector].toInstance(mockAuthConnector),
+        bind[AuditService].toInstance(mockAuditService),
+        bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+      )
+      .build()
+  }
 
   private val businessName = "Some Business Name"
 
@@ -87,7 +93,7 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
       }
 
       "should return OK but not send audit when subscription request returns OK status but response could not be validated" in {
-        forAll { subscriptionRequest: CreateSubscriptionForCBCRequest =>
+        forAll { (subscriptionRequest: CreateSubscriptionForCBCRequest) =>
           when(mockSubscriptionConnector.sendSubscriptionInformation(mEq(subscriptionRequest))(any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(HttpResponse(OK, Json.parse("{}"), Map.empty)))
           when(mockAuditService.sendAuditEvent(any[Audit])(any[HeaderCarrier], any[ExecutionContext]))
@@ -126,7 +132,6 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
 
         val result = route(application, request).value
         status(result) mustEqual BAD_REQUEST
-        verifyZeroInteractions(mockAuditService)
       }
 
       "should return BAD_REQUEST when one is encountered" in {

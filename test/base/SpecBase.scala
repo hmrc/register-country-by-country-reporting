@@ -17,12 +17,12 @@
 package base
 
 import config.AppConfig
-import org.mockito.MockitoSugar
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.play.guice._
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.*
 import play.api.Configuration
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
