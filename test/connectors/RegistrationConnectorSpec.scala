@@ -80,6 +80,19 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
         }
       }
+
+      "must return status as REQUEST_TIMEOUT for submission for a timeout error" in {
+
+        forAll(arbitrary[RegisterWithoutId]) { sub =>
+          stubResponse(
+            "/dac6/dct50a/v1",
+            REQUEST_TIMEOUT
+          )
+
+          val result = connector.sendWithoutIDInformation(sub)
+          result.futureValue.status mustBe REQUEST_TIMEOUT
+        }
+      }
     }
 
     "for a registration with id submission" - {
@@ -119,6 +132,19 @@ class RegistrationConnectorSpec extends SpecBase with WireMockServerHandler with
 
           val result = connector.sendWithID(sub)
           result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+
+      "must return status as REQUEST_TIMEOUT for submission for a timeout error" in {
+
+        forAll(arbitrary[RegisterWithID]) { sub =>
+          stubResponse(
+            "/dac6/dct50b/v1",
+            REQUEST_TIMEOUT
+          )
+
+          val result = connector.sendWithID(sub)
+          result.futureValue.status mustBe REQUEST_TIMEOUT
         }
       }
     }
