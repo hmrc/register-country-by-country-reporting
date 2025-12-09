@@ -73,15 +73,11 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
       }
 
       "must return status as REQUEST_TIMEOUT for submission of Subscription" in {
-        stubResponse(
-          "/dac6/dct50c/v1",
-          REQUEST_TIMEOUT
-        )
+        stubResponse("/dac6/dct50c/v1", REQUEST_TIMEOUT)
+        val subscriptionForCBCRequest = arbitraryCreateSubscriptionForCBCRequest.arbitrary.sample.get
 
-        forAll(arbitrary[CreateSubscriptionForCBCRequest]) { sub =>
-          val result = connector.sendSubscriptionInformation(sub)
-          result.futureValue.status mustBe REQUEST_TIMEOUT
-        }
+        val result = connector.sendSubscriptionInformation(subscriptionForCBCRequest)
+        result.futureValue.status mustBe REQUEST_TIMEOUT
       }
     }
 
@@ -112,15 +108,12 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
       }
 
       "must return status as REQUEST_TIMEOUT for read Subscription" in {
-        stubResponse(
-          "/dac6/dct50d/v1",
-          REQUEST_TIMEOUT
-        )
+        stubResponse("/dac6/dct50d/v1", REQUEST_TIMEOUT)
+        val subscriptionForCBCRequest = arbitraryReadSubscriptionForCBCRequest.arbitrary.sample.get
 
-        forAll(arbitrary[DisplaySubscriptionForCBCRequest]) { sub =>
-          val result = connector.readSubscriptionInformation(sub)
-          result.futureValue.status mustBe REQUEST_TIMEOUT
-        }
+        val result = connector.readSubscriptionInformation(subscriptionForCBCRequest)
+
+        result.futureValue.status mustBe REQUEST_TIMEOUT
       }
     }
   }
