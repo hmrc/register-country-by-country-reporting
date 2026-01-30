@@ -28,6 +28,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(ThisBuild / libraryDependencySchemes ++= Seq(
     "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
   ))
+addCommandAlias("testAll", "; test ; it/test")
 
 lazy val it = project
   .enablePlugins(PlayScala)

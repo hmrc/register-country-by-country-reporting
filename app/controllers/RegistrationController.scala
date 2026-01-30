@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import config.AppConfig
 import connectors.RegistrationConnector
-import controllers.auth.AuthAction
+import controllers.auth.IdentifierAuthAction
 import models.{ErrorDetails, RegisterWithID, RegisterWithoutId}
 import play.api.Logging
 import play.api.libs.json.{JsSuccess, JsValue, Json}
@@ -32,14 +32,14 @@ import scala.util.{Success, Try}
 
 class RegistrationController @Inject() (
   val config: AppConfig,
-  authenticate: AuthAction,
+  authenticate: IdentifierAuthAction,
   registrationConnector: RegistrationConnector,
   override val controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
 
-  def withoutOrgID: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+  def withoutOrgID: Action[JsValue] = (Action(parse.json) andThen authenticate).async { implicit request =>
     logger.info("Organisation without ID")
     request.body
       .validate[RegisterWithoutId]
@@ -52,7 +52,7 @@ class RegistrationController @Inject() (
       )
   }
 
-  def withOrgUTR: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+  def withOrgUTR: Action[JsValue] = (Action(parse.json) andThen authenticate).async { implicit request =>
     logger.info("Organisation having UTR")
     request.body
       .validate[RegisterWithID]

@@ -16,49 +16,37 @@
 
 package controllers.auth
 
-import com.google.inject.ImplementedBy
-import config.AppConfig
+import play.api.Logging
 import play.api.http.Status.UNAUTHORIZED
+import play.api.mvc.*
 import play.api.mvc.Results.Status
-import play.api.mvc._
-import uk.gov.hmrc.auth.core.AffinityGroup.Agent
-import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentifierAuthActionImpl @Inject() (
-  override val authConnector: AuthConnector,
-  val parser: BodyParsers.Default,
-  config: AppConfig
-)(implicit val executionContext: ExecutionContext)
-    extends IdentifierAuthAction
-    with AuthorisedFunctions {
+class IdentifierAuthAction @Inject() (
+  override val authConnector: AuthConnector
+)(implicit val ec: ExecutionContext)
+    extends ActionFilter[Request]
+    with AuthorisedFunctions
+    with Logging {
 
-  val agentEnrolmentKey: String = config.enrolmentKey("agent")
+  override protected def executionContext: ExecutionContext = ec
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+  override protected def filter[A](request: Request[A]): Future[Option[Result]] = {
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
     authorised()
-      .retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
-        case Enrolments(enrolments) ~ Some(Agent) if enrolments.exists(_.key.equals(agentEnrolmentKey)) =>
-          val arn =
-            for {
-              enrolment <- enrolments.find(_.key.equals(agentEnrolmentKey))
-              arn       <- enrolment.getIdentifier("AgentReferenceNumber")
-            } yield arn.value
-          block(IdentifierRequest(request, Agent, arn))
-        case Enrolments(_) ~ Some(affinityGroup) => block(IdentifierRequest(request, affinityGroup))
-        case _ ~ _                               => Future.successful(Status(UNAUTHORIZED))
+      .retrieve(Retrievals.affinityGroup) {
+        case Some(Organisation) => Future.successful(None)
+        case _                  => Future.successful(Some(Status(UNAUTHORIZED)))
       } recover { case _: NoActiveSession =>
-      Status(UNAUTHORIZED)
+      Some(Status(UNAUTHORIZED))
     }
   }
-}
 
-@ImplementedBy(classOf[IdentifierAuthActionImpl])
-trait IdentifierAuthAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
+}

@@ -17,15 +17,15 @@
 package controller
 
 import connectors.RegistrationConnector
-import controllers.auth.{AuthAction, AuthActionImpl}
+import controllers.auth.IdentifierAuthAction
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{doAnswer, spy, when}
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContent, BodyParsers, Request, Result}
+import play.api.mvc.Request
 import play.api.test.*
 import play.api.test.Helpers.*
 import play.api.{Application, inject}
@@ -33,8 +33,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpVerbs.POST
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
@@ -85,21 +84,6 @@ class RegistrationControllerSpec extends AnyWordSpec with Matchers with MockitoS
 
   private def authorisedApp(): Application = {
 
-    val realAuthAction = new AuthActionImpl(
-      authConnector = mock[AuthConnector],
-      parser = mock[BodyParsers.Default],
-    )
-
-    val authAction = spy(realAuthAction)
-
-    doAnswer { invocation =>
-      val request = invocation.getArgument(0, classOf[Request[AnyContent]])
-
-      val block = invocation.getArgument(1).asInstanceOf[Request[AnyContent] => Future[Result]]
-
-      block(request)
-    }.when(authAction).invokeBlock(any(), any())
-
     val mockRegistrationConnector = mock[RegistrationConnector]
 
     when(
@@ -112,8 +96,14 @@ class RegistrationControllerSpec extends AnyWordSpec with Matchers with MockitoS
 
     new GuiceApplicationBuilder()
       .overrides(
-        inject.bind[AuthAction].toInstance(authAction),
-        inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector)
+        inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+        inject
+          .bind[IdentifierAuthAction]
+          .toInstance(
+            new IdentifierAuthAction(mock[AuthConnector])(ExecutionContext.Implicits.global) {
+              override protected def filter[A](request: Request[A]) = Future.successful(None)
+            }
+          )
       )
       .build()
   }

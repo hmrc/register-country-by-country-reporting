@@ -43,12 +43,10 @@ class SubscriptionController @Inject() (
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
-
   implicit private val logging: Logger = logger
 
-  def createSubscription: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+  def createSubscription: Action[JsValue] = (Action(parse.json) andThen authenticate).async { implicit request =>
     val businessName: String = request.headers.get("X-Business-Name").getOrElse("Missing business name")
-
     request.body
       .validate[CreateSubscriptionForCBCRequest]
       .fold(
@@ -62,7 +60,7 @@ class SubscriptionController @Inject() (
   }
 
   def readSubscription(safeId: SafeId): Action[AnyContent] =
-    authenticate.async { implicit request =>
+    (Action andThen authenticate).async { implicit request =>
       subscriptionConnector
         .readSubscriptionInformation(DisplaySubscriptionForCBCRequest(safeId))
         .map(convertToResult(_))
