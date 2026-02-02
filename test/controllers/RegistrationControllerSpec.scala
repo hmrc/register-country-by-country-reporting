@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.RegistrationConnector
-import controllers.auth.{AuthAction, FakeAuthAction}
+import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import generators.Generators
 import models.*
 import org.mockito.ArgumentMatchers.any
@@ -29,7 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HttpVerbs.POST
@@ -52,7 +52,7 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
     .overrides(
       bind[RegistrationConnector].toInstance(mockRegistrationConnector),
       bind[AuthConnector].toInstance(mockAuthConnector),
-      bind[AuthAction].to[FakeAuthAction]
+      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
     )
     .build()
 

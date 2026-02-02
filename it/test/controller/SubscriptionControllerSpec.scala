@@ -16,30 +16,26 @@
 
 package controller
 
-import config.AppConfig
 import connectors.SubscriptionConnector
-import controllers.auth.{IdentifierAuthAction, IdentifierAuthActionImpl, IdentifierRequest}
+import controllers.auth.IdentifierAuthAction
 import org.apache.pekko.actor.ActorSystem
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{doAnswer, spy, when}
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContent, BodyParsers, Request, Result}
+import play.api.mvc.Request
 import play.api.test.*
 import play.api.test.Helpers.*
-import play.api.{Application, Configuration, inject}
-import uk.gov.hmrc.auth.core.AffinityGroup.Agent
+import play.api.{Application, inject}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpVerbs.POST
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionControllerSpec extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterAll {
 
@@ -78,34 +74,6 @@ class SubscriptionControllerSpec extends AnyWordSpec with Matchers with MockitoS
   private def unauthorisedApp(): Application = new GuiceApplicationBuilder().build()
 
   private def authorisedApp(): Application = {
-
-    val appConfig = new AppConfig(mock[Configuration], mock[ServicesConfig]) {
-      override val enrolmentKey: String => String = _ => "HMRC-AGENT-AGENT"
-    }
-
-    val realAuthAction = new IdentifierAuthActionImpl(
-      authConnector = mock[AuthConnector],
-      parser = new BodyParsers.Default(),
-      config = appConfig
-    )
-
-    val authAction = spy(realAuthAction)
-
-    doAnswer { invocation =>
-      val request = invocation.getArgument(0, classOf[Request[AnyContent]])
-
-      val block = invocation.getArgument(1).asInstanceOf[IdentifierRequest[AnyContent] => Future[Result]]
-
-      val identifierRequest =
-        IdentifierRequest(
-          request = request,
-          affinityGroup = Agent,
-          arn = None
-        )
-
-      block(identifierRequest)
-    }.when(authAction).invokeBlock(any(), any())
-
     val mockSubscriptionConnector = mock[SubscriptionConnector]
 
     when(mockSubscriptionConnector.readSubscriptionInformation(any())(any(), any())).thenReturn(Future.successful(HttpResponse(OK, "{}")))
@@ -113,9 +81,12 @@ class SubscriptionControllerSpec extends AnyWordSpec with Matchers with MockitoS
 
     new GuiceApplicationBuilder()
       .overrides(
-        inject.bind[IdentifierAuthAction].toInstance(authAction),
-        inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector)
-      )
+        inject.bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+        inject.bind[IdentifierAuthAction].toInstance(
+            new IdentifierAuthAction(mock[AuthConnector])(ExecutionContext.Implicits.global) {
+              override protected def filter[A](request: Request[A]) = Future.successful(None)
+            }
+      ))
       .build()
   }
 
