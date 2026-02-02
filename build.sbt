@@ -8,6 +8,7 @@ val silencerVersion = "1.7.7"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     Compile / scalafmtOnCompile := true,
