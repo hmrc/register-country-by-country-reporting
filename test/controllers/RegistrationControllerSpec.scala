@@ -340,10 +340,10 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
         val errorDetails = ErrorDetails(
           ErrorDetail(
             ZonedDateTime.now().toString,
-            "xx",
-            Some("403"),
-            Some("FORBIDDEN"),
-            Some(""),
+            Some("xx"),
+            "403",
+            "FORBIDDEN",
+            "",
             Some(SourceFaultDetail(Seq("a", "b")))
           )
         )
