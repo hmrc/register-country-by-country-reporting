@@ -60,7 +60,7 @@ package object controllers {
     val error = Try(Json.parse(body).validate[ErrorDetails])
     error match {
       case Success(JsSuccess(value, _)) =>
-        val errorCodeAndMessage = (value.errorDetail.errorCode.getOrElse("noErrorCode"), value.errorDetail.errorMessage.getOrElse("no error message provided"))
+        val errorCodeAndMessage = (value.errorDetail.errorCode, value.errorDetail.errorMessage)
         logger.warn(s"An error returned with ${errorCodeAndMessage._1} code and ${errorCodeAndMessage._2} as message")
       case _ =>
         logger.warn("Error with submission but return is not a valid json")

@@ -270,10 +270,10 @@ class SubscriptionControllerSpec extends SpecBase with BeforeAndAfterEach with G
         val errorDetails = ErrorDetails(
           ErrorDetail(
             ZonedDateTime.now().toString,
-            "xx",
-            Some("409"),
-            Some("CONFLICT"),
-            Some(""),
+            Some("xx"),
+            "403",
+            "FORBIDDEN",
+            "",
             Some(SourceFaultDetail(Seq("a", "b")))
           )
         )
