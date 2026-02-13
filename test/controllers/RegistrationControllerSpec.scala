@@ -340,10 +340,10 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
         val errorDetails = ErrorDetails(
           ErrorDetail(
             ZonedDateTime.now().toString,
-            Some("xx"),
-            "403",
-            "FORBIDDEN",
-            "",
+            "xx",
+            Some("403"),
+            Some("FORBIDDEN"),
+            Some(""),
             Some(SourceFaultDetail(Seq("a", "b")))
           )
         )
@@ -398,7 +398,7 @@ class RegistrationControllerSpec extends SpecBase with Generators with ScalaChec
               .withJsonBody(Json.toJson(withIdSubscription))
 
           val result = route(application, request).value
-          status(result) mustEqual INTERNAL_SERVER_ERROR
+          status(result) mustEqual SERVICE_UNAVAILABLE
         }
       }
     }
