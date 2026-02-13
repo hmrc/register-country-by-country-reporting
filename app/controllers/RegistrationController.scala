@@ -20,15 +20,14 @@ import com.google.inject.Inject
 import config.AppConfig
 import connectors.RegistrationConnector
 import controllers.auth.IdentifierAuthAction
-import models.{ErrorDetails, RegisterWithID, RegisterWithoutId}
-import play.api.Logging
-import play.api.libs.json.{JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Result}
+import models.{RegisterWithID, RegisterWithoutId}
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, ControllerComponents}
+import play.api.{Logger, Logging}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
 
 class RegistrationController @Inject() (
   val config: AppConfig,
@@ -38,7 +37,7 @@ class RegistrationController @Inject() (
 )(implicit executionContext: ExecutionContext)
     extends BackendController(controllerComponents)
     with Logging {
-
+  implicit private val logging: Logger = logger
   def withoutOrgID: Action[JsValue] = (Action(parse.json) andThen authenticate).async { implicit request =>
     logger.info("Organisation without ID")
     request.body
@@ -60,37 +59,5 @@ class RegistrationController @Inject() (
         _ => Future.successful(BadRequest("")),
         sub => registrationConnector.sendWithID(sub).map(convertToResult)
       )
-  }
-
-  private def convertToResult(httpResponse: HttpResponse): Result =
-    httpResponse.status match {
-      case OK        => Ok(httpResponse.body)
-      case NOT_FOUND => NotFound(httpResponse.body)
-
-      case BAD_REQUEST =>
-        logDownStreamError(httpResponse.body)
-
-        BadRequest(httpResponse.body)
-
-      case FORBIDDEN =>
-        logDownStreamError(httpResponse.body)
-
-        Forbidden(httpResponse.body)
-
-      case _ =>
-        logDownStreamError(httpResponse.body)
-        InternalServerError(httpResponse.body)
-    }
-
-  private def logDownStreamError(body: String): Unit = {
-    val error = Try(Json.parse(body).validate[ErrorDetails])
-    error match {
-      case Success(JsSuccess(value, _)) =>
-        logger.error(
-          s"Error with submission: ${value.errorDetail.sourceFaultDetail.map(_.detail.mkString)}"
-        )
-      case _ =>
-        logger.error("Error with submission but return is not a valid json")
-    }
   }
 }
