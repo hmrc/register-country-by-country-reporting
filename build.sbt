@@ -30,6 +30,10 @@ lazy val microservice = Project(appName, file("."))
     "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
   ))
 addCommandAlias("testAll", "; test ; it/test")
+addCommandAlias(
+  "precommit",
+  "; clean ; scalafmtAll ; coverage ; test ; it/test ; coverageReport ; coverageOff"
+)
 
 lazy val it = project
   .enablePlugins(PlayScala)
